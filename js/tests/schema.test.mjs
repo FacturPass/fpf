@@ -8,19 +8,19 @@ async function loadJson(path) {
 }
 
 const ajv = new Ajv2020.default({ allErrors: true, strict: false });
-const schema = await loadJson('../fpf-1.0.schema.json');
+const schema = await loadJson('../../fpf-1.0.schema.json');
 const check = ajv.compile(schema);
 
 test('minimal example is valid', async () => {
-  assert.ok(check(await loadJson('../examples/minimal.json')), JSON.stringify(check.errors));
+  assert.ok(check(await loadJson('../../examples/minimal.json')), JSON.stringify(check.errors));
 });
 
 test('complete example is valid', async () => {
-  assert.ok(check(await loadJson('../examples/complete.json')), JSON.stringify(check.errors));
+  assert.ok(check(await loadJson('../../examples/complete.json')), JSON.stringify(check.errors));
 });
 
 test('invalid example is rejected', async () => {
-  assert.equal(check(await loadJson('../examples/invalid-missing-einvoice.json')), false);
+  assert.equal(check(await loadJson('../../examples/invalid-missing-einvoice.json')), false);
 });
 
 test('additional top-level properties are rejected', () => {

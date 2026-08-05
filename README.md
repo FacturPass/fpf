@@ -12,14 +12,14 @@ besoin pour vous adresser une facture électronique (réforme française
   [schéma JSON](fpf-1.0.schema.json),
   [profil France](PROFILE-FR.md).
 - 🔧 Implémentation de référence :
-  [lib/fpf.js](lib/fpf.js) (`encode` / `decode` / `validate`).
+  [js/lib/fpf.js](js/lib/fpf.js) (`encode` / `decode` / `validate`).
 - 📱 Les identités générées restent dans le fragment d'URL : jamais envoyées au serveur.
 
 ## Développement
 
-Aucun build. Tests (Node ≥ 22) :
+Aucun build. Tests JS (Node ≥ 22), depuis `js/` :
 
-    npm install && npm test
+    cd js && npm install && npm test
 
 ## Licence
 
