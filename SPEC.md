@@ -13,7 +13,7 @@ Le document canonique est un objet JSON validé par
 |---|---|---|---|
 | `fpf` | oui | — | Version du format, `"1.0"`. |
 | `kind` | oui | — | `"buyer"`. (`"seller"` réservé, non défini en 1.0.) |
-| `legal.country` | oui | BT-55 | Pays, ISO 3166-1 alpha-2. |
+| `legal.country` | oui | — | Pays d'immatriculation, ISO 3166-1 alpha-2. Détermine le profil applicable (`FR` → profil France). EN 16931 n'a pas de terme dédié : BT-55 désigne le pays de l'adresse postale (voir `billing.country`). |
 | `legal.name` | oui | BT-44 | Raison sociale. |
 | `legal.form` | non | — | Forme juridique, texte libre. |
 | `legal.siren` | non | BT-47 | 9 chiffres. |
