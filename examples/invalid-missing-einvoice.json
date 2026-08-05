@@ -1,0 +1,5 @@
+{
+  "fpf": "1.0",
+  "kind": "buyer",
+  "legal": { "country": "FR", "name": "ACME SAS" }
+}

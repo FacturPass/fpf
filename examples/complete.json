@@ -1,0 +1,28 @@
+{
+  "fpf": "1.0",
+  "kind": "buyer",
+  "legal": {
+    "country": "FR",
+    "name": "ACME SAS",
+    "form": "SAS",
+    "siren": "542051180",
+    "siret": "73282932000074",
+    "vat": "FR59542051180"
+  },
+  "einvoice": {
+    "eas": "0225",
+    "address": "542051180_73282932000074_SERVICE1",
+    "platform": "Ma PDP"
+  },
+  "billing": {
+    "street": "1 rue de la Paix",
+    "zip": "75001",
+    "city": "Paris",
+    "country": "FR"
+  },
+  "contact": {
+    "email": "compta@acme.example",
+    "phone": "+33100000000",
+    "ref": "EMP-042"
+  }
+}
