@@ -143,6 +143,54 @@ pub fn decode(payload: &str) -> Result<FpfDocument, FpfError> {
     Ok(serde_json::from_slice(&bytes)?)
 }
 
+fn is_ascii_digits(s: &str, len: usize) -> bool {
+    s.len() == len && s.chars().all(|c| c.is_ascii_digit())
+}
+
+fn is_country_code(s: &str) -> bool {
+    s.len() == 2 && s.chars().all(|c| c.is_ascii_uppercase())
+}
+
+/// Structural + semantic validation mirroring the JS reference's `validate()`.
+/// Unlike JS, most "is this the right shape" checks are already guaranteed
+/// by successfully constructing an `FpfDocument` (via `decode` or directly) —
+/// this only checks constraints the type system cannot express: exact
+/// constant values and digit/letter patterns.
+pub fn validate(doc: &FpfDocument) -> Vec<String> {
+    let mut errors = Vec::new();
+
+    if doc.fpf != "1.0" {
+        errors.push(r#"fpf: must be "1.0""#.to_string());
+    }
+    if doc.kind != "buyer" {
+        errors.push(r#"kind: must be "buyer""#.to_string());
+    }
+    if !is_country_code(&doc.legal.country) {
+        errors.push("legal.country: ISO 3166-1 alpha-2 code required".to_string());
+    }
+    if doc.legal.name.trim().is_empty() {
+        errors.push("legal.name: non-empty string required".to_string());
+    }
+    if let Some(siren) = &doc.legal.siren {
+        if !is_ascii_digits(siren, 9) {
+            errors.push("legal.siren: must be 9 digits".to_string());
+        }
+    }
+    if let Some(siret) = &doc.legal.siret {
+        if !is_ascii_digits(siret, 14) {
+            errors.push("legal.siret: must be 14 digits".to_string());
+        }
+    }
+    if !is_ascii_digits(&doc.einvoice.eas, 4) {
+        errors.push("einvoice.eas: 4-digit EAS scheme code required".to_string());
+    }
+    if doc.einvoice.address.trim().is_empty() {
+        errors.push("einvoice.address: non-empty string required".to_string());
+    }
+
+    errors
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -213,5 +261,81 @@ mod tests {
             json_str,
             r#"{"fpf":"1.0","kind":"buyer","legal":{"country":"FR","name":"ACME SAS"},"einvoice":{"eas":"0225","address":"542051180"}}"#
         );
+    }
+}
+
+#[cfg(test)]
+mod validate_tests {
+    use super::*;
+
+    fn valid_doc() -> FpfDocument {
+        FpfDocument {
+            fpf: "1.0".to_string(),
+            kind: "buyer".to_string(),
+            legal: Legal {
+                country: "FR".to_string(),
+                name: "ACME SAS".to_string(),
+                form: None,
+                siren: None,
+                siret: None,
+                vat: None,
+            },
+            einvoice: Einvoice {
+                eas: "0225".to_string(),
+                address: "542051180".to_string(),
+                platform: None,
+            },
+            billing: None,
+            contact: None,
+        }
+    }
+
+    #[test]
+    fn minimal_valid_doc_has_no_errors() {
+        assert_eq!(validate(&valid_doc()), Vec::<String>::new());
+    }
+
+    #[test]
+    fn wrong_fpf_version() {
+        let mut doc = valid_doc();
+        doc.fpf = "2.0".to_string();
+        assert!(validate(&doc).iter().any(|e| e.starts_with("fpf:")));
+    }
+
+    #[test]
+    fn wrong_kind() {
+        let mut doc = valid_doc();
+        doc.kind = "seller".to_string();
+        assert!(validate(&doc).iter().any(|e| e.starts_with("kind:")));
+    }
+
+    #[test]
+    fn bad_country_and_empty_name() {
+        let mut doc = valid_doc();
+        doc.legal.country = "France".to_string();
+        doc.legal.name = "  ".to_string();
+        let errors = validate(&doc);
+        assert!(errors.iter().any(|e| e.starts_with("legal.country:")));
+        assert!(errors.iter().any(|e| e.starts_with("legal.name:")));
+    }
+
+    #[test]
+    fn bad_optional_siren_siret_formats() {
+        let mut doc = valid_doc();
+        doc.legal.siren = Some("12345".to_string());
+        doc.legal.siret = Some("ABC".to_string());
+        let errors = validate(&doc);
+        assert!(errors.iter().any(|e| e.starts_with("legal.siren:")));
+        assert!(errors.iter().any(|e| e.starts_with("legal.siret:")));
+    }
+
+    #[test]
+    fn bad_eas_and_empty_address() {
+        let mut doc = valid_doc();
+        doc.einvoice.eas = "22".to_string();
+        doc.einvoice.address = "".to_string();
+        let errors = validate(&doc);
+        assert!(errors.iter().any(|e| e.starts_with("einvoice.eas:")));
+        assert!(errors.iter().any(|e| e.starts_with("einvoice.address:")));
     }
 }
