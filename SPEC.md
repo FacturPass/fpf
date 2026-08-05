@@ -38,11 +38,27 @@ Le document voyage dans un fragment d'URL ou un QR code :
 | `1.` | JSON minifié UTF-8 → base64url (sans padding). |
 | `2.` | JSON minifié UTF-8 → deflate-raw (RFC 1951) → base64url. **Nominal.** |
 
+Pour le transport `1.`, toute implémentation **doit** sérialiser les objets
+dans cet ordre exact, pour permettre une comparaison octet-à-octet entre
+langages :
+
+    fpf, kind,
+    legal { country, name, form, siren, siret, vat },
+    einvoice { eas, address, platform },
+    billing { street, zip, city, country },
+    contact { email, phone, ref }
+
+Le transport `2.` (compressé) n'a pas cette contrainte : deux
+implémentations de deflate peuvent produire des octets différents pour un
+même document tout en se décompressant à l'identique. Son contrat
+d'interopérabilité repose uniquement sur le **decode**, jamais sur une
+correspondance octet-à-octet à l'encodage.
+
 Tout autre préfixe doit être rejeté. Le fragment n'est jamais envoyé au
 serveur : les données restent entre l'émetteur et le lecteur.
 
-Implémentation de référence (AGPL-3.0, navigateur + Node) :
-[`lib/fpf.js`](lib/fpf.js) — `encode`, `decode`, `validate`.
+Implémentations de référence (AGPL-3.0) :
+[`js/lib/fpf.js`](js/lib/fpf.js) (navigateur + Node) — `encode`, `decode`, `validate`.
 
 **Autorité : le JSON Schema est normatif.** `validate()` est un pré-contrôle
 structurel rapide (pensé pour la saisie interactive) qui n'implémente qu'un
