@@ -11,8 +11,9 @@ besoin pour vous adresser une facture électronique (réforme française
 - 📄 Format ouvert **FPF 1.0** : [SPEC.md](SPEC.md),
   [schéma JSON](fpf-1.0.schema.json),
   [profil France](PROFILE-FR.md).
-- 🔧 Implémentation de référence :
-  [js/lib/fpf.js](js/lib/fpf.js) (`encode` / `decode` / `validate`).
+- 🔧 Implémentations de référence :
+  [js/lib/fpf.js](js/lib/fpf.js) et [rust/src/lib.rs](rust/src/lib.rs)
+  (`encode` / `decode` / `validate`).
 - 📱 Les identités générées restent dans le fragment d'URL : jamais envoyées au serveur.
 
 ## Développement
