@@ -1,0 +1,16 @@
+name: ci-csharp
+on:
+  push:
+    branches: [main]
+    paths: ['csharp/**', 'examples/**', 'fpf-1.0.schema.json', 'test-vectors.json']
+  pull_request:
+    paths: ['csharp/**', 'examples/**', 'fpf-1.0.schema.json', 'test-vectors.json']
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - run: dotnet test csharp/Fpf.sln

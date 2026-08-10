@@ -17,4 +17,9 @@
     <ProjectReference Include="..\..\src\Fpf\Fpf.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="..\..\..\test-vectors.json" Link="test-vectors.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\..\examples\**" Link="examples\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

@@ -1,5 +1,6 @@
 using System.IO.Compression;
 using System.Text;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -15,9 +16,18 @@ public static partial class FpfCodec
     private const string PrefixRaw = "1.";
     private const string PrefixDeflate = "2.";
 
+    // System.Text.Json's default encoder is HTML-safe and escapes extra
+    // characters (e.g. "+" as "+") beyond what the JSON spec requires.
+    // JS's JSON.stringify and Rust's serde_json only escape the required
+    // minimum, so the default encoder would break the byte-exact "1."
+    // transport cross-language guarantee (caught by a "+33..." phone number
+    // in the shared test vectors). UnsafeRelaxedJsonEscaping matches their
+    // behavior; "unsafe" refers to raw HTML embedding, irrelevant here since
+    // this payload is never embedded unescaped into an HTML/JS document.
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 
     internal static string ToBase64Url(byte[] bytes) =>
