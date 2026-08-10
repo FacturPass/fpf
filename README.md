@@ -12,7 +12,8 @@ besoin pour vous adresser une facture électronique (réforme française
   [schéma JSON](fpf-1.0.schema.json),
   [profil France](PROFILE-FR.md).
 - 🔧 Implémentations de référence :
-  [js/lib/fpf.js](js/lib/fpf.js) et [rust/src/lib.rs](rust/src/lib.rs)
+  [js/lib/fpf.js](js/lib/fpf.js), [rust/src/lib.rs](rust/src/lib.rs) et
+  [csharp/src/Fpf](csharp/src/Fpf)
   (`encode` / `decode` / `validate`).
 - 📱 Les identités générées restent dans le fragment d'URL : jamais envoyées au serveur.
 
