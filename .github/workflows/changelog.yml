@@ -22,6 +22,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          # A pull request opened with the default GITHUB_TOKEN triggers no
+          # workflows, so its checks would never report and required checks
+          # would block the merge forever. CHANGELOG_TOKEN is a fine-grained
+          # PAT (Contents + Pull requests, read and write) and behaves like a
+          # human's. Falling back keeps the workflow working without it — the
+          # pull request simply opens without checks.
+          token: ${{ secrets.CHANGELOG_TOKEN || github.token }}
           # The changelog is built from the full history and from the version
           # tags, neither of which a shallow clone carries.
           fetch-depth: 0
@@ -32,7 +39,7 @@ jobs:
       - run: npm run changelog
       - name: Open or update the changelog pull request
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.CHANGELOG_TOKEN || github.token }}
         run: |
           if git diff --quiet -- CHANGELOG.md; then
             echo "CHANGELOG.md is already up to date."
