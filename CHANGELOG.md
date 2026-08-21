@@ -1,5 +1,15 @@
 ## [1.2.0](https://github.com/FacturPass/fpf/compare/v1.1.0...v1.2.0) (2026-08-21)
 
+### ⚠ BREAKING CHANGES
+
+* carry legal identifiers as scheme-qualified ids (#23)
+* withdraw FPF 1.0 (#21)
+
+### Features
+
+* carry legal identifiers as scheme-qualified ids ([#23](https://github.com/FacturPass/fpf/issues/23)) ([210aaac](https://github.com/FacturPass/fpf/commit/210aaaccef3be176bd712d5d754bc7e3a615462b))
+* withdraw FPF 1.0 ([#21](https://github.com/FacturPass/fpf/issues/21)) ([d048641](https://github.com/FacturPass/fpf/commit/d048641d68c0874433f75a470861f72427598f40))
+
 ### Bug Fixes
 
 * drop ignoreCommits, which broke every changelog run ([#13](https://github.com/FacturPass/fpf/issues/13)) ([f3d51c9](https://github.com/FacturPass/fpf/commit/f3d51c950aa7dbdc80778941dccf18c67f1412ef))
