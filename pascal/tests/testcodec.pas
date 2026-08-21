@@ -5,7 +5,7 @@ unit testcodec;
 interface
 
 uses
-  SysUtils, fpcunit, testregistry, base64, zstream, fpfbytes;
+  SysUtils, fpcunit, testregistry, base64, zstream, fpf, fpfbytes;
 
 type
   TCodecTest = class(TTestCase)
@@ -16,6 +16,10 @@ type
     procedure DeflateRoundTripsUtf8;
     procedure InflateReadsAPayloadProducedByTheJsImplementation;
     procedure InflateRejectsATruncatedStream;
+    procedure EncodeProducesTheCanonicalKeyOrder;
+    procedure EncodeOmitsEmptyOptionalKeys;
+    procedure EncodeMatchesTheMinimalVectorByteForByte;
+    procedure EncodeCompressedUsesThe2Prefix;
   end;
 
 const
@@ -30,6 +34,17 @@ const
     '"einvoice":{"eas":"0225","address":"542051180"}}';
 
 implementation
+
+function MinimalDoc: TFpfDocument;
+begin
+  Result := Default(TFpfDocument);
+  Result.Fpf := '1.1';
+  Result.Kind := 'buyer';
+  Result.Legal.Country := 'FR';
+  Result.Legal.Name := 'ACME SAS';
+  Result.Einvoice.Eas := '0225';
+  Result.Einvoice.Address := '542051180';
+end;
 
 procedure TCodecTest.Base64UrlHasNoPaddingOrUnsafeCharacters;
 var
@@ -79,6 +94,37 @@ begin
   except
     on E: Edecompressionerror do ; // expected
   end;
+end;
+
+procedure TCodecTest.EncodeProducesTheCanonicalKeyOrder;
+begin
+  AssertEquals(MINIMAL_JSON, RawInflate(FromBase64Url(Copy(FpfEncode(MinimalDoc, True), 3, MaxInt))));
+end;
+
+procedure TCodecTest.EncodeOmitsEmptyOptionalKeys;
+var
+  Json: RawByteString;
+begin
+  Json := FromBase64Url(Copy(FpfEncode(MinimalDoc, False), 3, MaxInt));
+  AssertEquals('no billing key', 0, Pos('billing', Json));
+  AssertEquals('no contact key', 0, Pos('contact', Json));
+  AssertEquals('no form key', 0, Pos('"form"', Json));
+  AssertEquals('no ids key', 0, Pos('"ids"', Json));
+end;
+
+procedure TCodecTest.EncodeMatchesTheMinimalVectorByteForByte;
+begin
+  // payload_raw of the "minimal" vector, produced by the JS reference.
+  AssertEquals(
+    '1.eyJmcGYiOiIxLjEiLCJraW5kIjoiYnV5ZXIiLCJsZWdhbCI6eyJjb3VudHJ5IjoiRlIiLCJuYW1l' +
+    'IjoiQUNNRSBTQVMifSwiZWludm9pY2UiOnsiZWFzIjoiMDIyNSIsImFkZHJlc3MiOiI1NDIwNTExOD' +
+    'AifX0',
+    FpfEncode(MinimalDoc, False));
+end;
+
+procedure TCodecTest.EncodeCompressedUsesThe2Prefix;
+begin
+  AssertEquals('2.', Copy(FpfEncode(MinimalDoc, True), 1, 2));
 end;
 
 initialization
