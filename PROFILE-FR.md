@@ -1,4 +1,4 @@
-# FPF 1.0 / 1.1 — Profil France
+# FPF 1.1 — Profil France
 
 Règles supplémentaires pour un FacturPass français (`legal.country: "FR"`),
 alignées sur la réforme de la facturation électronique B2B et la norme

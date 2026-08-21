@@ -5,7 +5,7 @@ changes should keep it that way.
 
 ## Repository structure
 
-- [`SPEC.md`](SPEC.md), [`fpf-1.0.schema.json`](fpf-1.0.schema.json),
+- [`SPEC.md`](SPEC.md), [`fpf-1.1.schema.json`](fpf-1.1.schema.json),
   [`PROFILE-FR.md`](PROFILE-FR.md) — the format itself.
 - [`examples/`](examples/) and [`test-vectors.json`](test-vectors.json) — shared
   fixtures used by every language implementation.
@@ -18,9 +18,9 @@ changes should keep it that way.
 This is the highest-bar kind of change, since it affects every existing FPF reader
 and writer. Open an issue first to discuss the change before writing code — spec
 changes need to keep every reference implementation and `PROFILE-FR.md` consistent,
-and backward compatibility with FPF 1.0 documents already in the wild is a hard
-constraint. A new incompatible field or requirement needs a version bump, not a
-silent change to `"1.0"`.
+and backward compatibility with documents already in the wild is a hard constraint.
+A new incompatible field or requirement needs a version bump, not a silent change
+to `"1.1"`.
 
 ## Changing a reference implementation
 
@@ -80,6 +80,6 @@ same time. `conventional-changelog` treats the package version as the release be
 leaving it equal to the latest tag makes every commit after that tag vanish from the changelog —
 silently, since regeneration then produces an identical file and the workflow reports nothing to do.
 
-**The format version and the changelog are versioned separately.** `"fpf": "1.0"` changes only
+**The format version and the changelog are versioned separately.** `"fpf": "1.1"` changes only
 when the on-the-wire document schema changes; tooling and implementation improvements that leave
 the format untouched are released without a format version bump.

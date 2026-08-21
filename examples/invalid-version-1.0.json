@@ -1,9 +1,10 @@
 {
-  "fpf": "1.1",
+  "fpf": "1.0",
   "kind": "buyer",
   "legal": {
     "country": "FR",
-    "name": "ACME SAS"
+    "name": "ACME SAS",
+    "siren": "542051180"
   },
   "einvoice": {
     "eas": "0225",

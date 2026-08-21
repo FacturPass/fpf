@@ -6,7 +6,7 @@ public class FpfValidateTests
 {
     private static FpfDocument ValidDoc() => new()
     {
-        Fpf = "1.0",
+        Fpf = "1.1",
         Kind = "buyer",
         Legal = new Legal { Country = "FR", Name = "ACME SAS" },
         Einvoice = new Einvoice { Eas = "0225", Address = "542051180" },
@@ -67,5 +67,19 @@ public class FpfValidateTests
         var errors = FpfCodec.Validate(doc);
         Assert.Contains(errors, e => e.StartsWith("legal:"));
         Assert.Contains(errors, e => e.StartsWith("einvoice:"));
+    }
+
+    [Fact]
+    public void WithdrawnVersion1_0IsRejected()
+    {
+        var doc = ValidDoc() with { Fpf = "1.0" };
+        Assert.Contains(FpfCodec.Validate(doc), e => e == "fpf: must be \"1.1\"");
+    }
+
+    [Fact]
+    public void LegacyContactRefIsNamedAsARename()
+    {
+        var doc = ValidDoc() with { Contact = new Contact { Ref = "EMP-042" } };
+        Assert.Contains(FpfCodec.Validate(doc), e => e == "contact.ref: renamed to contact.buyerReference in FPF 1.1");
     }
 }

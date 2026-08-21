@@ -1,4 +1,4 @@
-# FPF — FacturPass Format 1.0 / 1.1
+# FPF — FacturPass Format 1.1
 
 Format JSON ouvert (licence AGPL-3.0-or-later) portant l'identité de facturation
 électronique d'un acheteur, conçu pour tenir dans un QR code ou une URL.
@@ -6,12 +6,12 @@ Format JSON ouvert (licence AGPL-3.0-or-later) portant l'identité de facturatio
 ## Document
 
 Le document canonique est un objet JSON validé par
-[`fpf-1.0.schema.json`](fpf-1.0.schema.json). Exemples :
+[`fpf-1.1.schema.json`](fpf-1.1.schema.json). Exemples :
 [minimal](examples/minimal.json), [complet](examples/complete.json).
 
 | Champ | Oblig. | EN 16931 | Description |
 |---|---|---|---|
-| `fpf` | oui | — | Version du format, `"1.0"` ou `"1.1"`. |
+| `fpf` | oui | — | Version du format, `"1.1"`. |
 | `kind` | oui | — | `"buyer"`. (`"seller"` réservé, non défini à ce jour.) |
 | `legal.country` | oui | — | Pays d'immatriculation, ISO 3166-1 alpha-2. Détermine le profil applicable (`FR` → profil France). EN 16931 n'a pas de terme dédié : BT-55 désigne le pays de l'adresse postale (voir `billing.country`). |
 | `legal.name` | oui | BT-44 | Raison sociale. |
@@ -24,22 +24,22 @@ Le document canonique est un objet JSON validé par
 | `einvoice.platform` | non | — | Nom de la plateforme de réception. **Informatif et volatile** : il change dès que l'entreprise change de plateforme, alors qu'un lien FacturPass est permanent. L'annuaire central fait foi ; préférez l'omettre. |
 | `billing.*` | non | BG-8 | Adresse postale de facturation. |
 | `contact.email`, `contact.phone` | non | — | Contact de facturation. |
-| `contact.buyerReference` | non | BT-10 | Référence propre à l'acheteur (bon de commande, centre de coût), que le vendeur reporte sur la facture. **Nommée `contact.ref` en 1.0** — voir Versions. |
+| `contact.buyerReference` | non | BT-10 | Référence propre à l'acheteur (bon de commande, centre de coût), que le vendeur reporte sur la facture. Nommée `contact.ref` par la 1.0, retirée — voir Versionnement. |
 
 Les clés optionnelles absentes sont **omises** (jamais `""` ni `null`).
 
-## Versions
+## Versionnement
 
-| Version | Schéma | Différence |
-|---|---|---|
-| `1.0` | [`fpf-1.0.schema.json`](fpf-1.0.schema.json) | `contact.ref` |
-| `1.1` | [`fpf-1.1.schema.json`](fpf-1.1.schema.json) | `contact.ref` renommé `contact.buyerReference`, mappé BT-10 |
+Le champ `fpf` porte la version du document. Un lecteur **doit** accepter toutes
+les versions publiées — un QR code imprimé il y a des années doit rester
+décodable — et un producteur écrit toujours dans la plus récente.
 
-Un lecteur **doit** accepter toutes les versions publiées : un QR code imprimé
-il y a des années doit rester décodable. Il se fie au champ `fpf` pour savoir
-quelle clé attendre — chaque version n'accepte que la sienne, jamais les deux,
-de sorte qu'un document ne peut pas être ambigu. Un producteur écrit dans la
-version la plus récente.
+Aujourd'hui il n'en existe qu'une, `1.1`, décrite par
+[`fpf-1.1.schema.json`](fpf-1.1.schema.json). La `1.0` a été publiée brièvement
+puis **retirée avant qu'aucun document ne soit remis à personne** : elle nommait
+`contact.ref` ce que la `1.1` nomme `contact.buyerReference` (BT-10). Un document
+portant `"fpf": "1.0"` doit être **refusé**, jamais lu — une lecture approximative
+de `contact.ref` serait pire qu'un refus net.
 
 ## Transport
 
@@ -60,8 +60,7 @@ langages :
     legal { country, name, form, siren, siret, vat },
     einvoice { eas, address, platform },
     billing { street, zip, city, country },
-    contact { email, phone, ref }              // 1.0
-    contact { email, phone, buyerReference }   // 1.1
+    contact { email, phone, buyerReference }
 
 Le transport `2.` (compressé) n'a pas cette contrainte : deux
 implémentations de deflate peuvent produire des octets différents pour un

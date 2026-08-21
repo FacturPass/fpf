@@ -41,11 +41,11 @@ public sealed record Contact
 {
     [JsonPropertyName("email")] public string? Email { get; init; }
     [JsonPropertyName("phone")] public string? Phone { get; init; }
-    // FPF 1.0 spells it "ref"; 1.1 renamed it "buyerReference" (EN 16931 BT-10).
-    // Both live here so one type reads either version; validation enforces that a
-    // document carries only the key its own version defines. Declaration order
-    // matters: System.Text.Json emits properties in this order, and the two are
-    // mutually exclusive, so the canonical key order holds for both versions.
+    // "buyerReference" (EN 16931 BT-10) is the only spelling. "ref" is kept so the
+    // validator can name the rename for anyone who read stale documentation — the
+    // withdrawn 1.0 used it. Declaration order matters: System.Text.Json emits
+    // properties in this order, and the two are mutually exclusive, so the
+    // canonical key order holds.
     [JsonPropertyName("ref")] public string? Ref { get; init; }
     [JsonPropertyName("buyerReference")] public string? BuyerReference { get; init; }
 }
