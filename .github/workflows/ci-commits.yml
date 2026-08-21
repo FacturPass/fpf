@@ -9,7 +9,7 @@ on:
 jobs:
   # A commit-msg hook only protects contributors who installed it, and it can be
   # skipped with --no-verify. This is what actually guards main.
-  commits:
+  commit-messages:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,7 +24,7 @@ jobs:
   # Merges here are squashed, so the pull request title becomes the commit
   # message on main. Two commits already on main came from titles that predate
   # the convention and are invisible in the generated changelog as a result.
-  title:
+  pr-title:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
