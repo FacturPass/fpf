@@ -1,4 +1,4 @@
-//! FPF 1.0/1.1 reference implementation — encode/decode of the transport payload.
+//! FPF 1.1 reference implementation — encode/decode of the transport payload.
 //! Mirrors the JS reference implementation at ../js/lib/fpf.js.
 
 use std::io::{Read, Write};
@@ -161,8 +161,8 @@ fn is_country_code(s: &str) -> bool {
 pub fn validate(doc: &FpfDocument) -> Vec<String> {
     let mut errors = Vec::new();
 
-    if doc.fpf != "1.0" && doc.fpf != "1.1" {
-        errors.push(r#"fpf: must be "1.0" or "1.1""#.to_string());
+    if doc.fpf != "1.1" {
+        errors.push(r#"fpf: must be "1.1""#.to_string());
     }
     if doc.kind != "buyer" {
         errors.push(r#"kind: must be "buyer""#.to_string());
@@ -190,14 +190,11 @@ pub fn validate(doc: &FpfDocument) -> Vec<String> {
         errors.push("einvoice.address: non-empty string required".to_string());
     }
 
-    // Each version accepts only its own contact key, so a document is never
-    // ambiguous about which one it meant.
     if let Some(contact) = &doc.contact {
-        if doc.fpf == "1.1" && contact.r#ref.is_some() {
+        // The withdrawn 1.0 spelled this contact.ref; naming the rename beats
+        // letting the schema call it an unknown property.
+        if contact.r#ref.is_some() {
             errors.push("contact.ref: renamed to contact.buyerReference in FPF 1.1".to_string());
-        }
-        if doc.fpf == "1.0" && contact.buyer_reference.is_some() {
-            errors.push("contact.buyerReference: not in FPF 1.0, use contact.ref".to_string());
         }
     }
 
@@ -210,7 +207,7 @@ mod tests {
 
     fn sample_doc() -> FpfDocument {
         FpfDocument {
-            fpf: "1.0".to_string(),
+            fpf: "1.1".to_string(),
             kind: "buyer".to_string(),
             legal: Legal {
                 country: "FR".to_string(),
@@ -272,7 +269,7 @@ mod tests {
         let json_str = String::from_utf8(json_bytes).unwrap();
         assert_eq!(
             json_str,
-            r#"{"fpf":"1.0","kind":"buyer","legal":{"country":"FR","name":"ACME SAS"},"einvoice":{"eas":"0225","address":"542051180"}}"#
+            r#"{"fpf":"1.1","kind":"buyer","legal":{"country":"FR","name":"ACME SAS"},"einvoice":{"eas":"0225","address":"542051180"}}"#
         );
     }
 }
@@ -283,7 +280,7 @@ mod validate_tests {
 
     fn valid_doc() -> FpfDocument {
         FpfDocument {
-            fpf: "1.0".to_string(),
+            fpf: "1.1".to_string(),
             kind: "buyer".to_string(),
             legal: Legal {
                 country: "FR".to_string(),
@@ -350,5 +347,25 @@ mod validate_tests {
         let errors = validate(&doc);
         assert!(errors.iter().any(|e| e.starts_with("einvoice.eas:")));
         assert!(errors.iter().any(|e| e.starts_with("einvoice.address:")));
+    }
+
+    #[test]
+    fn version_1_0_is_rejected() {
+        let mut doc = valid_doc();
+        doc.fpf = "1.0".to_string();
+        assert_eq!(validate(&doc), vec![r#"fpf: must be "1.1""#.to_string()]);
+    }
+
+    #[test]
+    fn legacy_contact_ref_is_named_as_a_rename() {
+        let mut doc = valid_doc();
+        doc.contact = Some(Contact {
+            r#ref: Some("EMP-042".to_string()),
+            ..Default::default()
+        });
+        assert_eq!(
+            validate(&doc),
+            vec!["contact.ref: renamed to contact.buyerReference in FPF 1.1".to_string()]
+        );
     }
 }
