@@ -9,6 +9,8 @@ uses
 
 type
   TCodecTest = class(TTestCase)
+  private
+    procedure AssertDecodeFails(const Payload: string; Expected: TFpfErrorKind; const Why: string);
   published
     procedure Base64UrlHasNoPaddingOrUnsafeCharacters;
     procedure Base64UrlRoundTripsBinary;
@@ -20,6 +22,14 @@ type
     procedure EncodeOmitsEmptyOptionalKeys;
     procedure EncodeMatchesTheMinimalVectorByteForByte;
     procedure EncodeCompressedUsesThe2Prefix;
+    procedure DecodeRoundTripsBothTransports;
+    procedure DecodeReadsTheJsMinimalVector;
+    procedure DecodeRejectsAnUnknownPrefix;
+    procedure DecodeRejectsCorruptedBase64;
+    procedure DecodeRejectsATruncatedDeflatePayload;
+    procedure DecodeRejectsInvalidJson;
+    procedure DecodeRejectsAMissingRequiredKey;
+    procedure DecodeKeepsALeadingZeroInAnIdentifier;
   end;
 
 const
@@ -125,6 +135,80 @@ end;
 procedure TCodecTest.EncodeCompressedUsesThe2Prefix;
 begin
   AssertEquals('2.', Copy(FpfEncode(MinimalDoc, True), 1, 2));
+end;
+
+procedure TCodecTest.DecodeRoundTripsBothTransports;
+var
+  Doc: TFpfDocument;
+begin
+  Doc := FpfDecode(FpfEncode(MinimalDoc, False));
+  AssertEquals('ACME SAS', Doc.Legal.Name);
+  Doc := FpfDecode(FpfEncode(MinimalDoc, True));
+  AssertEquals('542051180', Doc.Einvoice.Address);
+end;
+
+procedure TCodecTest.DecodeReadsTheJsMinimalVector;
+var
+  Doc: TFpfDocument;
+begin
+  Doc := FpfDecode('2.' + MINIMAL_DEFLATE_BODY);
+  AssertEquals('1.1', Doc.Fpf);
+  AssertEquals('buyer', Doc.Kind);
+  AssertEquals('FR', Doc.Legal.Country);
+  AssertEquals('0225', Doc.Einvoice.Eas);
+end;
+
+procedure TCodecTest.AssertDecodeFails(const Payload: string; Expected: TFpfErrorKind; const Why: string);
+begin
+  try
+    FpfDecode(Payload);
+    Fail(Why);
+  except
+    on E: EFpfError do
+      AssertTrue(Why + ' (wrong error kind: ' + E.Message + ')', E.Kind = Expected);
+  end;
+end;
+
+procedure TCodecTest.DecodeRejectsAnUnknownPrefix;
+begin
+  AssertDecodeFails('9.abcdef', fekUnknownPrefix, 'an unknown prefix must be refused, not guessed at');
+end;
+
+procedure TCodecTest.DecodeRejectsCorruptedBase64;
+begin
+  AssertDecodeFails('1.!!!!', fekBase64, 'corrupted base64 must be refused');
+end;
+
+procedure TCodecTest.DecodeRejectsATruncatedDeflatePayload;
+begin
+  AssertDecodeFails('2.YWJj', fekInflate, 'a truncated deflate payload must be refused');
+end;
+
+procedure TCodecTest.DecodeRejectsInvalidJson;
+begin
+  AssertDecodeFails('1.' + ToBase64Url('{not json'), fekJson, 'invalid JSON must be refused');
+end;
+
+procedure TCodecTest.DecodeRejectsAMissingRequiredKey;
+begin
+  AssertDecodeFails('1.' + ToBase64Url('{"fpf":"1.1","kind":"buyer"}'), fekJson,
+    'a document without legal and einvoice must not decode into a half-filled record');
+end;
+
+procedure TCodecTest.DecodeKeepsALeadingZeroInAnIdentifier;
+var
+  Doc: TFpfDocument;
+begin
+  // The classic hand-rolled-decoder bug: an identifier read as a number loses
+  // its leading zero and stops comparing equal to the string it came from.
+  Doc := FpfDecode('1.' + ToBase64Url(
+    '{"fpf":"1.1","kind":"buyer","legal":{"country":"FR","name":"ACME SAS",' +
+    '"ids":[{"scheme":"0009","value":"07282932000074"}]},' +
+    '"einvoice":{"eas":"0225","address":"542051180"}}'));
+  AssertEquals(1, Length(Doc.Legal.Ids));
+  AssertEquals('0009', Doc.Legal.Ids[0].Scheme);
+  AssertEquals('07282932000074', Doc.Legal.Ids[0].Value);
+  AssertTrue('ids present', Doc.Legal.IdsPresent);
 end;
 
 initialization

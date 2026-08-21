@@ -91,6 +91,10 @@ type
 // error path for encoding.
 function FpfEncode(const Doc: TFpfDocument; Compress: Boolean = True): string;
 
+// Decodes a transport payload back into a document. Raises EFpfError, whose
+// Kind says which of the four ways it failed.
+function FpfDecode(const Payload: string): TFpfDocument;
+
 implementation
 
 uses
@@ -115,6 +119,43 @@ begin
     Result := PREFIX_DEFLATE + ToBase64Url(RawDeflate(Json))
   else
     Result := PREFIX_RAW + ToBase64Url(Json);
+end;
+
+function FpfDecode(const Payload: string): TFpfDocument;
+var
+  Body: string;
+  Bytes: RawByteString;
+begin
+  if Copy(Payload, 1, Length(PREFIX_DEFLATE)) = PREFIX_DEFLATE then
+  begin
+    Body := Copy(Payload, Length(PREFIX_DEFLATE) + 1, MaxInt);
+    try
+      Bytes := FromBase64Url(Body);
+    except
+      on E: Exception do
+        raise EFpfError.Create(fekBase64, 'FPF: base64 decode error: ' + E.Message);
+    end;
+    try
+      Bytes := RawInflate(Bytes);
+    except
+      on E: Exception do
+        raise EFpfError.Create(fekInflate, 'FPF: inflate error: ' + E.Message);
+    end;
+  end
+  else if Copy(Payload, 1, Length(PREFIX_RAW)) = PREFIX_RAW then
+  begin
+    Body := Copy(Payload, Length(PREFIX_RAW) + 1, MaxInt);
+    try
+      Bytes := FromBase64Url(Body);
+    except
+      on E: Exception do
+        raise EFpfError.Create(fekBase64, 'FPF: base64 decode error: ' + E.Message);
+    end;
+  end
+  else
+    raise EFpfError.Create(fekUnknownPrefix, 'FPF: unknown payload prefix');
+
+  Result := JsonToDoc(Bytes);
 end;
 
 end.

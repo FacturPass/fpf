@@ -11,11 +11,12 @@ uses
   fpf;
 
 function DocToJson(const Doc: TFpfDocument): RawByteString;
+function JsonToDoc(const Json: RawByteString): TFpfDocument;
 
 implementation
 
 uses
-  SysUtils, fpjson;
+  SysUtils, fpjson, jsonparser;
 
 // Adds Key only when Value is non-empty. An empty optional must be omitted
 // from the document entirely — never emitted as "" or null.
@@ -125,6 +126,112 @@ begin
     end;
   finally
     Root.Free;
+  end;
+end;
+
+// Requires the key and refuses anything that is not a JSON string. Mirrors
+// serde refusing a struct field that is missing or of the wrong type: a
+// missing required key is an error at decode, not a silently empty field.
+function RequireString(Obj: TJSONObject; const Key: string): string;
+var
+  Item: TJSONData;
+begin
+  Item := Obj.Find(Key);
+  if (Item = nil) or (Item.JSONType <> jtString) then
+    raise EFpfError.Create(fekJson, 'FPF: JSON error: missing field `' + Key + '`');
+  Result := Item.AsString;
+end;
+
+// Optional: absent, null, or the wrong type all read as absent.
+function OptionalString(Obj: TJSONObject; const Key: string): string;
+var
+  Item: TJSONData;
+begin
+  Item := Obj.Find(Key);
+  if (Item = nil) or (Item.JSONType <> jtString) then
+    Result := ''
+  else
+    Result := Item.AsString;
+end;
+
+function RequireObject(Obj: TJSONObject; const Key: string): TJSONObject;
+var
+  Item: TJSONData;
+begin
+  Item := Obj.Find(Key);
+  if (Item = nil) or (Item.JSONType <> jtObject) then
+    raise EFpfError.Create(fekJson, 'FPF: JSON error: missing field `' + Key + '`');
+  Result := TJSONObject(Item);
+end;
+
+function JsonToDoc(const Json: RawByteString): TFpfDocument;
+var
+  Root, Node, IdNode: TJSONObject;
+  Ids: TJSONData;
+  I: Integer;
+  Parsed: TJSONData;
+begin
+  Result := Default(TFpfDocument);
+  try
+    Parsed := GetJSON(Json);
+  except
+    on E: Exception do
+      raise EFpfError.Create(fekJson, 'FPF: JSON error: ' + E.Message);
+  end;
+  try
+    if Parsed.JSONType <> jtObject then
+      raise EFpfError.Create(fekJson, 'FPF: JSON error: document must be a JSON object');
+    Root := TJSONObject(Parsed);
+
+    Result.Fpf := RequireString(Root, 'fpf');
+    Result.Kind := RequireString(Root, 'kind');
+
+    Node := RequireObject(Root, 'legal');
+    Result.Legal.Country := RequireString(Node, 'country');
+    Result.Legal.Name := RequireString(Node, 'name');
+    Result.Legal.Form := OptionalString(Node, 'form');
+    Result.Legal.Vat := OptionalString(Node, 'vat');
+    Ids := Node.Find('ids');
+    if (Ids <> nil) and (Ids.JSONType = jtArray) then
+    begin
+      Result.Legal.IdsPresent := True;
+      SetLength(Result.Legal.Ids, TJSONArray(Ids).Count);
+      for I := 0 to TJSONArray(Ids).Count - 1 do
+      begin
+        if TJSONArray(Ids).Items[I].JSONType <> jtObject then
+          raise EFpfError.Create(fekJson, 'FPF: JSON error: legal.ids entries must be objects');
+        IdNode := TJSONObject(TJSONArray(Ids).Items[I]);
+        Result.Legal.Ids[I].Scheme := RequireString(IdNode, 'scheme');
+        Result.Legal.Ids[I].Value := RequireString(IdNode, 'value');
+      end;
+    end;
+
+    Node := RequireObject(Root, 'einvoice');
+    Result.Einvoice.Eas := RequireString(Node, 'eas');
+    Result.Einvoice.Address := RequireString(Node, 'address');
+    Result.Einvoice.PlatformName := OptionalString(Node, 'platform');
+
+    Ids := Root.Find('billing');
+    if (Ids <> nil) and (Ids.JSONType = jtObject) then
+    begin
+      Node := TJSONObject(Ids);
+      Result.Billing.Street := OptionalString(Node, 'street');
+      Result.Billing.Zip := OptionalString(Node, 'zip');
+      Result.Billing.City := OptionalString(Node, 'city');
+      Result.Billing.Country := OptionalString(Node, 'country');
+    end;
+
+    Ids := Root.Find('contact');
+    if (Ids <> nil) and (Ids.JSONType = jtObject) then
+    begin
+      Node := TJSONObject(Ids);
+      Result.Contact.Email := OptionalString(Node, 'email');
+      Result.Contact.Phone := OptionalString(Node, 'phone');
+      Result.Contact.Ref := OptionalString(Node, 'ref');
+      Result.Contact.BuyerReference := OptionalString(Node, 'buyerReference');
+    end;
+  finally
+    Parsed.Free;
   end;
 end;
 
