@@ -13,11 +13,18 @@ uses fpf;
 Run from the repository root:
 
 ```bash
-fpc -Fupascal/src -opascal/tests/fpftests pascal/tests/fpftests.lpr
+fpc -Fupascal/src -Fupascal/tests -opascal/tests/fpftests pascal/tests/fpftests.lpr
 pascal/tests/fpftests --format=plain --all
 ```
 
-The runner exits non-zero when a test fails. Tests include the shared
+The runner exits non-zero when a test fails. `fpc` compiles incrementally and
+will happily reuse a stale `.ppu`: if a result looks impossible after an edit,
+delete the build artifacts and compile again.
+
+```bash
+rm -f pascal/src/*.ppu pascal/src/*.o pascal/tests/*.ppu pascal/tests/*.o
+```
+ Tests include the shared
 [`test-vectors.json`](../test-vectors.json) also used by the JS, Rust and C#
 implementations — keep it in sync via
 [`js/scripts/generate-test-vectors.mjs`](../js/README.md) if you change

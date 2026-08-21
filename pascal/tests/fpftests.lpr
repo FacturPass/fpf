@@ -5,7 +5,8 @@ program fpftests;
 uses
   consoletestrunner,
   testcodec,
-  testvalidate;
+  testvalidate,
+  testvectors;
 
 var
   App: TTestRunner;
