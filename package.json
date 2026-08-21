@@ -1,0 +1,22 @@
+{
+  "name": "fpf-repo-tooling",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "AGPL-3.0-or-later",
+  "description": "Repository-level tooling only. The reference implementations live in js/, rust/ and csharp/ and carry their own dependencies.",
+  "scripts": {
+    "prepare": "husky",
+    "changelog": "conventional-changelog -n ./changelog.config.js -i CHANGELOG.md -s -r 0"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.5.0",
+    "@commitlint/config-conventional": "^19.5.0",
+    "conventional-changelog-cli": "^5.0.0",
+    "conventional-changelog-conventionalcommits": "^8.0.0",
+    "husky": "^9.1.6"
+  }
+}

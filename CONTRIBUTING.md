@@ -58,3 +58,23 @@ anyone.
 
 Please don't open a public issue for a security vulnerability — see
 [`SECURITY.md`](SECURITY.md).
+
+## Commits and changelog
+
+Commit messages follow [Conventional Commits](https://www.conventionalcommits.org/) in English.
+`commitlint` enforces this locally through the husky `commit-msg` hook, and again in CI over
+every commit a pull request adds — a local hook only protects contributors who installed it.
+The **pull request title** is checked too, because merges here are squashed: the title becomes
+the commit message that lands on `main`.
+
+`CHANGELOG.md` is generated from the history by `conventional-changelog`; run `npm run changelog`
+from the repo root when cutting a release. It regenerates the whole file, so never hand-edit it —
+anything written there is lost on the next run.
+
+Two commits already on `main` came from squashed pull request titles written before this
+convention existed, so they cannot be classified and do not appear in the generated changelog.
+They are the reason the title check exists; nothing similar can be lost from now on.
+
+**The format version and the changelog are versioned separately.** `"fpf": "1.0"` changes only
+when the on-the-wire document schema changes; tooling and implementation improvements that leave
+the format untouched are released without a format version bump.
