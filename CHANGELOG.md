@@ -9,6 +9,7 @@
 
 ### Documentation
 
+* bring the READMEs up to FPF 1.1 ([#19](https://github.com/FacturPass/fpf/issues/19)) ([e968a3f](https://github.com/FacturPass/fpf/commit/e968a3f6bbcf4ac80859db353799d78ebc77e527))
 * point the documentation at facturpass.com ([#17](https://github.com/FacturPass/fpf/issues/17)) ([e0b83f3](https://github.com/FacturPass/fpf/commit/e0b83f386881903509e611ffd54c47db543fb6e3))
 
 ### Continuous Integration
