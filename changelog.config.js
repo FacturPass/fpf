@@ -2,17 +2,17 @@
 // changes by default, which hides documentation, CI and chore work entirely.
 // This repo carries a format spec and three ports, where a `docs:` commit can
 // matter more than a `feat:` one, so every type gets a section.
+//
+// Nothing filters the workflow's own `docs(changelog):` commits out of the
+// changelog: the `ignoreCommits` option that would do it takes a shape that
+// differs between versions of git-raw-commits, and passing the wrong one fails
+// the whole run with "ignore.test is not a function". The loop it was meant to
+// prevent is already stopped in changelog.yml, which refuses to run on its own
+// commit — plain YAML, with no library contract to get wrong. The cost is that
+// those entries show up in the changelog.
 import createPreset from 'conventional-changelog-conventionalcommits';
 
 export default createPreset({
-  // The workflow commits its own regeneration as `docs(changelog): …`. Without
-  // this, that commit lands in the changelog, the next regeneration therefore
-  // produces a diff, and the workflow opens a fresh pull request for it — a
-  // loop that only stopped before because the GITHUB_TOKEN could not trigger
-  // workflows. The PAT can, so the guard has to be explicit.
-  // The scope is optional in the pattern so the unscoped commits already on
-  // main, written before this guard existed, are filtered out too.
-  ignoreCommits: [/^docs(\(changelog\))?: regenerate CHANGELOG/],
   types: [
     { type: 'feat', section: 'Features' },
     { type: 'fix', section: 'Bug Fixes' },
