@@ -1,0 +1,15 @@
+{
+  "fpf": "1.1",
+  "kind": "buyer",
+  "legal": {
+    "country": "FR",
+    "name": "ACME SAS"
+  },
+  "einvoice": {
+    "eas": "0225",
+    "address": "542051180"
+  },
+  "contact": {
+    "ref": "EMP-042"
+  }
+}

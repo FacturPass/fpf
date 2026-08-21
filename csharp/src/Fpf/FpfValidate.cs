@@ -19,7 +19,7 @@ public static partial class FpfCodec
     {
         var errors = new List<string>();
 
-        if (doc.Fpf != "1.0") errors.Add("fpf: must be \"1.0\"");
+        if (doc.Fpf is not ("1.0" or "1.1")) errors.Add("fpf: must be \"1.0\" or \"1.1\"");
         if (doc.Kind != "buyer") errors.Add("kind: must be \"buyer\"");
 
         if (doc.Legal is null)
@@ -42,6 +42,16 @@ public static partial class FpfCodec
         {
             if (!IsAsciiDigits(doc.Einvoice.Eas, 4)) errors.Add("einvoice.eas: 4-digit EAS scheme code required");
             if (string.IsNullOrWhiteSpace(doc.Einvoice.Address)) errors.Add("einvoice.address: non-empty string required");
+        }
+
+        // Each version accepts only its own contact key, so a document is never
+        // ambiguous about which one it meant.
+        if (doc.Contact is { } contact)
+        {
+            if (doc.Fpf == "1.1" && contact.Ref is not null)
+                errors.Add("contact.ref: renamed to contact.buyerReference in FPF 1.1");
+            if (doc.Fpf == "1.0" && contact.BuyerReference is not null)
+                errors.Add("contact.buyerReference: not in FPF 1.0, use contact.ref");
         }
 
         return errors;

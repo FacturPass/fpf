@@ -13,9 +13,14 @@ async function loadExample(name) {
   return JSON.parse(await readFile(new URL(name, EXAMPLES_DIR), 'utf8'));
 }
 
+// Both format versions are covered: the 1.0 vectors guard the promise that
+// documents already in the wild keep decoding, the 1.1 ones pin the current
+// canonical key order (contact.buyerReference replacing contact.ref).
 const VECTOR_SOURCES = [
   ['minimal', 'minimal.json'],
   ['complete', 'complete.json'],
+  ['minimal-1.1', 'minimal-1.1.json'],
+  ['complete-1.1', 'complete-1.1.json'],
 ];
 
 const vectors = [];
@@ -27,7 +32,7 @@ for (const [name, file] of VECTOR_SOURCES) {
 }
 
 const output = {
-  fpf_version: '1.0',
+  fpf_versions: ['1.0', '1.1'],
   vectors,
   decode_failures: [
     { name: 'unknown-prefix', payload: '9.abcdef' },
@@ -35,6 +40,7 @@ const output = {
   ],
   validate_failures: [
     { name: 'missing-einvoice', example: 'invalid-missing-einvoice.json' },
+    { name: '1.1-with-legacy-ref', example: 'invalid-1.1-legacy-ref.json' },
   ],
 };
 

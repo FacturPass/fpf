@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { encode, decode } from '../lib/fpf.js';
+import { encode, decode, validate } from '../lib/fpf.js';
 
 const DOC = {
   fpf: '1.0',
@@ -51,3 +51,18 @@ test('compressed payload is smaller than raw for a full doc', async () => {
   const raw = await encode(full, { compress: false });
   assert.ok(deflated.length < raw.length);
 });
+
+// --- FPF 1.1 round-trip ---
+// test-vectors.json pins the cross-language contract; these keep the JS
+// reference honest on its own, without loading the shared file.
+
+import { readFile } from 'node:fs/promises';
+
+for (const name of ['minimal-1.1.json', 'complete-1.1.json']) {
+  test(`round-trip ${name} through both transports`, async () => {
+    const doc = JSON.parse(await readFile(new URL(`../../examples/${name}`, import.meta.url), 'utf8'));
+    assert.deepEqual(await decode(await encode(doc, { compress: false })), doc);
+    assert.deepEqual(await decode(await encode(doc, { compress: true })), doc);
+    assert.deepEqual(validate(doc), []);
+  });
+}
