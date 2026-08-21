@@ -75,6 +75,11 @@ Two commits already on `main` came from squashed pull request titles written bef
 convention existed, so they cannot be classified and do not appear in the generated changelog.
 They are the reason the title check exists; nothing similar can be lost from now on.
 
+When you tag a release, bump `version` in the root `package.json` to the *next* version at the
+same time. `conventional-changelog` treats the package version as the release being prepared, so
+leaving it equal to the latest tag makes every commit after that tag vanish from the changelog —
+silently, since regeneration then produces an identical file and the workflow reports nothing to do.
+
 **The format version and the changelog are versioned separately.** `"fpf": "1.0"` changes only
 when the on-the-wire document schema changes; tooling and implementation improvements that leave
 the format untouched are released without a format version bump.

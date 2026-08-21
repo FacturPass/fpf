@@ -1,3 +1,9 @@
+## [1.2.0](https://github.com/FacturPass/fpf/compare/v1.1.0...v1.2.0) (2026-08-21)
+
+### Continuous Integration
+
+* open a pull request for the changelog instead of pushing to main ([#8](https://github.com/FacturPass/fpf/issues/8)) ([75b6a25](https://github.com/FacturPass/fpf/commit/75b6a25c2c62c8976e55b49b1026ce891eef1db9))
+* regenerate the changelog automatically and tag format versions ([#7](https://github.com/FacturPass/fpf/issues/7)) ([c6bcbd4](https://github.com/FacturPass/fpf/commit/c6bcbd41e98596115f878456e2fc53d33e607ce3))
 
 ## [1.1.0](https://github.com/FacturPass/fpf/compare/v1.0.0...v1.1.0) (2026-08-21)
 
