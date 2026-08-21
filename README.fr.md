@@ -26,7 +26,8 @@ directement — lire le format, générer le format — sans dépendre de Factur
 
 ## Contenu
 
-- [`SPEC.md`](SPEC.md) — la spécification FPF.
+- [`SPEC.md`](SPEC.md) — la spécification FPF, dont ce qu'exige la
+  [conformité](SPEC.md#conformité) d'un lecteur, d'un émetteur ou d'un récepteur d'API.
 - [`fpf-1.1.schema.json`](fpf-1.1.schema.json) — schéma JSON pour la validation
   structurelle.
 - [`PROFILE-FR.md`](PROFILE-FR.md) — règles supplémentaires pour

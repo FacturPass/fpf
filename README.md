@@ -24,7 +24,8 @@ generate the format — without depending on FacturPass at all.
 
 ## Contents
 
-- [`SPEC.md`](SPEC.md) — the FPF specification.
+- [`SPEC.md`](SPEC.md) — the FPF specification, including what claiming
+  [conformance](SPEC.md#conformité) requires of a reader, a writer, or an API receiver.
 - [`fpf-1.1.schema.json`](fpf-1.1.schema.json) — JSON Schema for structural validation.
 - [`PROFILE-FR.md`](PROFILE-FR.md) — additional rules for `legal.country: "FR"`.
 - [`examples/`](examples/) — example documents (minimal, complete, invalid).
