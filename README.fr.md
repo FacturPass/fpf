@@ -26,9 +26,10 @@ directement — lire le format, générer le format — sans dépendre de Factur
 
 ## Contenu
 
-- [`SPEC.md`](SPEC.md) — la spécification FPF 1.0.
-- [`fpf-1.0.schema.json`](fpf-1.0.schema.json) — schéma JSON pour la validation
-  structurelle.
+- [`SPEC.md`](SPEC.md) — la spécification FPF, couvrant 1.0 et 1.1.
+- [`fpf-1.1.schema.json`](fpf-1.1.schema.json) — schéma JSON pour la validation
+  structurelle. [`fpf-1.0.schema.json`](fpf-1.0.schema.json) est conservé
+  inchangé pour les documents déjà émis.
 - [`PROFILE-FR.md`](PROFILE-FR.md) — règles supplémentaires pour
   `legal.country: "FR"`.
 - [`examples/`](examples/) — documents d'exemple (minimal, complet, invalide).
@@ -54,17 +55,24 @@ la liste des champs.
 
 ```json
 {
-  "fpf": "1.0",
+  "fpf": "1.1",
   "kind": "buyer",
   "legal": { "country": "FR", "name": "ACME SAS", "siren": "542051180" },
-  "einvoice": { "eas": "0225", "address": "542051180" }
+  "einvoice": { "eas": "0225", "address": "542051180_54205118000066" },
+  "contact": { "buyerReference": "CDE-2026-4471" }
 }
 ```
 
 ## État
 
-FPF 1.0 est la version actuelle et stable. Les changements sont suivis dans
-[`CHANGELOG.md`](CHANGELOG.md).
+FPF 1.1 est la version actuelle et stable. Elle renomme `contact.ref` en
+`contact.buyerReference`, qui correspond au terme métier EN 16931 **BT-10**.
+
+**Un lecteur doit accepter toutes les versions publiées** : un QR code imprimé
+n'a pas de date de péremption, les documents 1.0 restent donc valides
+indéfiniment. Chaque version n'accepte que sa propre clé, jamais les deux : un
+document n'est jamais ambigu, il suffit de lire le champ `fpf`. Les changements
+sont suivis dans [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Contribuer
 
