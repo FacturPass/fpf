@@ -45,7 +45,7 @@ version la plus récente.
 
 Le document voyage dans un fragment d'URL ou un QR code :
 
-    https://facturpass.fr/#<prefixe><base64url(donnees)>
+    https://facturpass.com/#<prefixe><base64url(donnees)>
 
 | Préfixe | Encodage |
 |---|---|

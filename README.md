@@ -15,7 +15,7 @@ meter" of the reform. The format itself is generic (EN 16931-aligned, any EAS
 scheme); a [France-specific profile](PROFILE-FR.md) documents the additional rules
 for that reform.
 
-[**FacturPass**](https://facturpass.fr) is the reference site that generates FPF QR
+[**FacturPass**](https://facturpass.com) is the reference site that generates FPF QR
 codes; this repository is the format itself, kept independent of it so any
 point-of-sale or accounting software can implement FPF directly — read the format,
 generate the format — without depending on FacturPass at all.
