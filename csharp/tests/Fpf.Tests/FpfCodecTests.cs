@@ -6,7 +6,7 @@ public class FpfCodecTests
 {
     private static FpfDocument SampleDoc() => new()
     {
-        Fpf = "1.0",
+        Fpf = "1.1",
         Kind = "buyer",
         Legal = new Legal { Country = "FR", Name = "ACME SAS" },
         Einvoice = new Einvoice { Eas = "0225", Address = "542051180" },
@@ -55,7 +55,7 @@ public class FpfCodecTests
         var payload = FpfCodec.Encode(doc, compress: false);
         var json = DecodeRawBody(payload);
         Assert.Equal(
-            "{\"fpf\":\"1.0\",\"kind\":\"buyer\",\"legal\":{\"country\":\"FR\",\"name\":\"ACME SAS\"},\"einvoice\":{\"eas\":\"0225\",\"address\":\"542051180\"}}",
+            "{\"fpf\":\"1.1\",\"kind\":\"buyer\",\"legal\":{\"country\":\"FR\",\"name\":\"ACME SAS\"},\"einvoice\":{\"eas\":\"0225\",\"address\":\"542051180\"}}",
             json);
     }
 
