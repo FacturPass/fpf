@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { encode, decode, validate } from '../lib/fpf.js';
 
 const DOC = {
-  fpf: '1.0',
+  fpf: '1.1',
   kind: 'buyer',
   legal: { country: 'FR', name: 'Société Générale d’Électricité' },
   einvoice: { eas: '0225', address: '542051180' },
@@ -45,20 +45,20 @@ test('compressed payload is smaller than raw for a full doc', async () => {
     ...DOC,
     legal: { ...DOC.legal, form: 'SAS', siren: '542051180', siret: '73282932000074', vat: 'FR59542051180' },
     billing: { street: '1 rue de la Paix', zip: '75001', city: 'Paris', country: 'FR' },
-    contact: { email: 'compta@example.fr', phone: '+33100000000', ref: 'EMP-042' },
+    contact: { email: 'compta@example.fr', phone: '+33100000000', buyerReference: 'EMP-042' },
   };
   const deflated = await encode(full);
   const raw = await encode(full, { compress: false });
   assert.ok(deflated.length < raw.length);
 });
 
-// --- FPF 1.1 round-trip ---
+// --- Round-trip against the published examples ---
 // test-vectors.json pins the cross-language contract; these keep the JS
 // reference honest on its own, without loading the shared file.
 
 import { readFile } from 'node:fs/promises';
 
-for (const name of ['minimal-1.1.json', 'complete-1.1.json']) {
+for (const name of ['minimal.json', 'complete.json']) {
   test(`round-trip ${name} through both transports`, async () => {
     const doc = JSON.parse(await readFile(new URL(`../../examples/${name}`, import.meta.url), 'utf8'));
     assert.deepEqual(await decode(await encode(doc, { compress: false })), doc);
