@@ -3,6 +3,7 @@
 ### Bug Fixes
 
 * drop ignoreCommits, which broke every changelog run ([#13](https://github.com/FacturPass/fpf/issues/13)) ([f3d51c9](https://github.com/FacturPass/fpf/commit/f3d51c950aa7dbdc80778941dccf18c67f1412ef))
+* keep the changelog from narrating its own upkeep ([#15](https://github.com/FacturPass/fpf/issues/15)) ([d1b61d7](https://github.com/FacturPass/fpf/commit/d1b61d751461710d8f421dda31ace1c437f5ae6c)), closes [#20](https://github.com/FacturPass/fpf/issues/20)
 * stop dropping commits made after the latest tag from the changelog ([#9](https://github.com/FacturPass/fpf/issues/9)) ([b7a78c4](https://github.com/FacturPass/fpf/commit/b7a78c4bb031aaede64b25a5ba9d95c07fe18600))
 * stop the changelog workflow from looping on its own commits ([#12](https://github.com/FacturPass/fpf/issues/12)) ([46c02ee](https://github.com/FacturPass/fpf/commit/46c02ee7cb2cc45aee1b61e486f64902f151c13b))
 
