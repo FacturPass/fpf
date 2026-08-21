@@ -5,8 +5,16 @@
     "country": "FR",
     "name": "ACME SAS",
     "form": "SAS",
-    "siren": "542051180",
-    "siret": "73282932000074",
+    "ids": [
+      {
+        "scheme": "0002",
+        "value": "542051180"
+      },
+      {
+        "scheme": "0009",
+        "value": "73282932000074"
+      }
+    ],
     "vat": "FR59542051180"
   },
   "einvoice": {

@@ -56,7 +56,7 @@ la liste des champs.
 {
   "fpf": "1.1",
   "kind": "buyer",
-  "legal": { "country": "FR", "name": "ACME SAS", "siren": "542051180" },
+  "legal": { "country": "FR", "name": "ACME SAS", "ids": [{ "scheme": "0002", "value": "542051180" }] },
   "einvoice": { "eas": "0225", "address": "542051180_54205118000066" },
   "contact": { "buyerReference": "CDE-2026-4471" }
 }

@@ -16,8 +16,20 @@
         "country": { "type": "string", "pattern": "^[A-Z]{2}$", "description": "ISO 3166-1 alpha-2 — EN 16931 BT-55" },
         "name": { "type": "string", "minLength": 1, "description": "Legal name — EN 16931 BT-44" },
         "form": { "type": "string", "minLength": 1, "description": "Legal form (SAS, SARL...)" },
-        "siren": { "type": "string", "pattern": "^[0-9]{9}$", "description": "FR company id — EN 16931 BT-47" },
-        "siret": { "type": "string", "pattern": "^[0-9]{14}$", "description": "FR establishment id — no EN 16931 term of its own; addressing component of einvoice.address" },
+        "ids": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Legal registration identifiers — EN 16931 BT-47, each qualified by its scheme (BT-47-1). Country-specific meanings live in the country profiles.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["scheme", "value"],
+            "properties": {
+              "scheme": { "type": "string", "pattern": "^[0-9]{4}$", "description": "ICD scheme code, same registry as einvoice.eas (0002 = FR SIREN, 0009 = FR SIRET)" },
+              "value": { "type": "string", "minLength": 1, "description": "The identifier itself, as a string — never a number" }
+            }
+          }
+        },
         "vat": { "type": "string", "pattern": "^[A-Z]{2}[0-9A-Za-z]{2,12}$", "description": "VAT id — EN 16931 BT-48" }
       }
     },

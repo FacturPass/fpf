@@ -41,14 +41,42 @@ public class FpfValidateTests
         Assert.Contains(errors, e => e.StartsWith("legal.name:"));
     }
 
-    [Fact]
-    public void BadOptionalSirenSiretFormats()
+    private static FpfDocument WithIds(params LegalId[] ids)
     {
         var baseDoc = ValidDoc();
-        var doc = baseDoc with { Legal = baseDoc.Legal with { Siren = "12345", Siret = "ABC" } };
-        var errors = FpfCodec.Validate(doc);
-        Assert.Contains(errors, e => e.StartsWith("legal.siren:"));
-        Assert.Contains(errors, e => e.StartsWith("legal.siret:"));
+        return baseDoc with { Legal = baseDoc.Legal with { Ids = ids } };
+    }
+
+    [Fact]
+    public void WellFormedLegalIdsPass()
+    {
+        var doc = WithIds(
+            new LegalId { Scheme = "0002", Value = "542051180" },
+            new LegalId { Scheme = "0009", Value = "73282932000074" });
+        Assert.Empty(FpfCodec.Validate(doc));
+    }
+
+    [Fact]
+    public void LegalIdSchemeMustBeFourDigits()
+    {
+        var doc = WithIds(new LegalId { Scheme = "2", Value = "542051180" });
+        Assert.Contains(FpfCodec.Validate(doc), e => e.StartsWith("legal.ids[0].scheme:"));
+    }
+
+    [Fact]
+    public void DuplicateLegalIdSchemeIsRejected()
+    {
+        var doc = WithIds(
+            new LegalId { Scheme = "0002", Value = "542051180" },
+            new LegalId { Scheme = "0002", Value = "999999999" });
+        Assert.Contains(FpfCodec.Validate(doc), e => e.Contains("duplicate scheme 0002"));
+    }
+
+    [Fact]
+    public void TheCoreKnowsNothingAboutSirenLengths()
+    {
+        // "12345" is not a SIREN, but that is PROFILE-FR's business, not the core's.
+        Assert.Empty(FpfCodec.Validate(WithIds(new LegalId { Scheme = "0002", Value = "12345" })));
     }
 
     [Fact]

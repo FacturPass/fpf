@@ -43,7 +43,7 @@ test('truncated payload rejects', async () => {
 test('compressed payload is smaller than raw for a full doc', async () => {
   const full = {
     ...DOC,
-    legal: { ...DOC.legal, form: 'SAS', siren: '542051180', siret: '73282932000074', vat: 'FR59542051180' },
+    legal: { ...DOC.legal, form: 'SAS', ids: [{ scheme: '0002', value: '542051180' }, { scheme: '0009', value: '73282932000074' }], vat: 'FR59542051180' },
     billing: { street: '1 rue de la Paix', zip: '75001', city: 'Paris', country: 'FR' },
     contact: { email: 'compta@example.fr', phone: '+33100000000', buyerReference: 'EMP-042' },
   };
