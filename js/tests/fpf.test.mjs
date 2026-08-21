@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { encode, decode } from '../lib/fpf.js';
+import { encode, decode, validate } from '../lib/fpf.js';
 
 const DOC = {
   fpf: '1.0',
@@ -51,3 +51,19 @@ test('compressed payload is smaller than raw for a full doc', async () => {
   const raw = await encode(full, { compress: false });
   assert.ok(deflated.length < raw.length);
 });
+
+// --- FPF 1.1 round-trip ---
+// Cross-language vectors in test-vectors.json stay 1.0-only until the C# and
+// Rust ports land: their suites iterate every vector and would fail on a 1.1
+// document. Until then the JS reference covers 1.1 on its own.
+
+import { readFile } from 'node:fs/promises';
+
+for (const name of ['minimal-1.1.json', 'complete-1.1.json']) {
+  test(`round-trip ${name} through both transports`, async () => {
+    const doc = JSON.parse(await readFile(new URL(`../../examples/${name}`, import.meta.url), 'utf8'));
+    assert.deepEqual(await decode(await encode(doc, { compress: false })), doc);
+    assert.deepEqual(await decode(await encode(doc, { compress: true })), doc);
+    assert.deepEqual(validate(doc), []);
+  });
+}

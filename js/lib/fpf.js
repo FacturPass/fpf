@@ -1,5 +1,9 @@
-// FPF 1.0 reference implementation — encode/decode of the transport payload.
+// FPF 1.0/1.1 reference implementation — encode/decode of the transport payload.
 // Works unchanged in browsers (>= 2023) and Node >= 22.
+
+// Every version ever published stays readable: a QR code printed years ago
+// must still decode. New documents are written in the latest version.
+const VERSIONS = ['1.0', '1.1'];
 
 const PREFIX_RAW = '1.';
 const PREFIX_DEFLATE = '2.';
@@ -49,7 +53,7 @@ export function validate(doc) {
     return ['document: must be a JSON object'];
   }
   const errors = [];
-  if (doc.fpf !== '1.0') errors.push('fpf: must be "1.0"');
+  if (!VERSIONS.includes(doc.fpf)) errors.push('fpf: must be "1.0" or "1.1"');
   if (doc.kind !== 'buyer') errors.push('kind: must be "buyer"');
 
   const legal = doc.legal;
@@ -68,6 +72,19 @@ export function validate(doc) {
   } else {
     if (!/^\d{4}$/.test(einvoice.eas ?? '')) errors.push('einvoice.eas: 4-digit EAS scheme code required');
     if (typeof einvoice.address !== 'string' || einvoice.address.trim() === '') errors.push('einvoice.address: non-empty string required');
+  }
+
+  // contact.ref became contact.buyerReference (EN 16931 BT-10) in 1.1. Each
+  // version accepts only its own key, so a reader keys off doc.fpf and never
+  // has to guess which of the two a document meant.
+  const contact = doc.contact;
+  if (contact !== null && typeof contact === 'object') {
+    if (doc.fpf === '1.1' && contact.ref !== undefined) {
+      errors.push('contact.ref: renamed to contact.buyerReference in FPF 1.1');
+    }
+    if (doc.fpf === '1.0' && contact.buyerReference !== undefined) {
+      errors.push('contact.buyerReference: not in FPF 1.0, use contact.ref');
+    }
   }
   return errors;
 }
