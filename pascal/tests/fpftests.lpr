@@ -4,7 +4,8 @@ program fpftests;
 
 uses
   consoletestrunner,
-  testcodec;
+  testcodec,
+  testvalidate;
 
 var
   App: TTestRunner;

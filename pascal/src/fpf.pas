@@ -95,6 +95,14 @@ function FpfEncode(const Doc: TFpfDocument; Compress: Boolean = True): string;
 // Kind says which of the four ways it failed.
 function FpfDecode(const Payload: string): TFpfDocument;
 
+// Structural and semantic validation, mirroring the Rust reference's
+// validate(). Unlike the untyped JS reference, the "is this the right shape"
+// checks are already guaranteed by holding a TFpfDocument at all: a record
+// always has a Legal and an Einvoice, so `legal: required object` has no case
+// in which it could fire. A payload missing those keys is refused by
+// FpfDecode instead.
+function FpfValidate(const Doc: TFpfDocument): TFpfErrors;
+
 implementation
 
 uses
@@ -156,6 +164,88 @@ begin
     raise EFpfError.Create(fekUnknownPrefix, 'FPF: unknown payload prefix');
 
   Result := JsonToDoc(Bytes);
+end;
+
+function IsAsciiDigits(const S: string; Len: Integer): Boolean;
+var
+  I: Integer;
+begin
+  Result := Length(S) = Len;
+  if not Result then
+    Exit;
+  for I := 1 to Length(S) do
+    if not (S[I] in ['0'..'9']) then
+      Exit(False);
+end;
+
+function IsCountryCode(const S: string): Boolean;
+var
+  I: Integer;
+begin
+  Result := Length(S) = 2;
+  if not Result then
+    Exit;
+  for I := 1 to Length(S) do
+    if not (S[I] in ['A'..'Z']) then
+      Exit(False);
+end;
+
+procedure Add(var Errors: TFpfErrors; const Message: string);
+begin
+  SetLength(Errors, Length(Errors) + 1);
+  Errors[High(Errors)] := Message;
+end;
+
+function FpfValidate(const Doc: TFpfDocument): TFpfErrors;
+var
+  I, J: Integer;
+  Duplicate: Boolean;
+begin
+  Result := nil;
+
+  if Doc.Fpf <> '1.1' then
+    Add(Result, 'fpf: must be "1.1"');
+  if Doc.Kind <> 'buyer' then
+    Add(Result, 'kind: must be "buyer"');
+
+  if not IsCountryCode(Doc.Legal.Country) then
+    Add(Result, 'legal.country: ISO 3166-1 alpha-2 code required');
+  if Trim(Doc.Legal.Name) = '' then
+    Add(Result, 'legal.name: non-empty string required');
+
+  if (Length(Doc.Legal.Ids) > 0) or Doc.Legal.IdsPresent then
+  begin
+    if Length(Doc.Legal.Ids) = 0 then
+      Add(Result, 'legal.ids: non-empty array required when present');
+    for I := 0 to High(Doc.Legal.Ids) do
+    begin
+      if not IsAsciiDigits(Doc.Legal.Ids[I].Scheme, 4) then
+        Add(Result, Format('legal.ids[%d].scheme: 4-digit ICD scheme code required', [I]))
+      else
+      begin
+        Duplicate := False;
+        for J := 0 to I - 1 do
+          if Doc.Legal.Ids[J].Scheme = Doc.Legal.Ids[I].Scheme then
+            Duplicate := True;
+        if Duplicate then
+          Add(Result, Format('legal.ids[%d].scheme: duplicate scheme %s', [I, Doc.Legal.Ids[I].Scheme]));
+      end;
+      // A number here is the classic hand-rolled-encoder bug: a SIRET emitted
+      // as 73282932000074 loses any leading zero and breaks string comparison.
+      if Trim(Doc.Legal.Ids[I].Value) = '' then
+        Add(Result, Format('legal.ids[%d].value: non-empty string required', [I]));
+    end;
+  end;
+
+  if not IsAsciiDigits(Doc.Einvoice.Eas, 4) then
+    Add(Result, 'einvoice.eas: 4-digit EAS scheme code required');
+  if Trim(Doc.Einvoice.Address) = '' then
+    Add(Result, 'einvoice.address: non-empty string required');
+
+  // The withdrawn 1.0 spelled this contact.ref; naming the rename beats
+  // letting the schema call it an unknown property.
+  if Doc.Contact.Ref <> '' then
+    Add(Result, 'contact.ref: renamed to contact.buyerReference in FPF 1.1');
 end;
 
 end.
