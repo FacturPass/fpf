@@ -31,11 +31,18 @@ pub struct Legal {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub form: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub siren: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub siret: Option<String>,
+    pub ids: Option<Vec<LegalId>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub vat: Option<String>,
+}
+
+// A registration identifier (EN 16931 BT-47) qualified by its ICD scheme code
+// (BT-47-1), drawn from the same registry as einvoice.eas. What a scheme means —
+// 0002 is a French SIREN, 0009 a SIRET — belongs to the country profiles.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct LegalId {
+    pub scheme: String,
+    pub value: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -173,14 +180,22 @@ pub fn validate(doc: &FpfDocument) -> Vec<String> {
     if doc.legal.name.trim().is_empty() {
         errors.push("legal.name: non-empty string required".to_string());
     }
-    if let Some(siren) = &doc.legal.siren {
-        if !is_ascii_digits(siren, 9) {
-            errors.push("legal.siren: must be 9 digits".to_string());
+    if let Some(ids) = &doc.legal.ids {
+        if ids.is_empty() {
+            errors.push("legal.ids: non-empty array required when present".to_string());
         }
-    }
-    if let Some(siret) = &doc.legal.siret {
-        if !is_ascii_digits(siret, 14) {
-            errors.push("legal.siret: must be 14 digits".to_string());
+        let mut seen: Vec<&str> = Vec::new();
+        for (i, id) in ids.iter().enumerate() {
+            if !is_ascii_digits(&id.scheme, 4) {
+                errors.push(format!("legal.ids[{i}].scheme: 4-digit ICD scheme code required"));
+            } else if seen.contains(&id.scheme.as_str()) {
+                errors.push(format!("legal.ids[{i}].scheme: duplicate scheme {}", id.scheme));
+            } else {
+                seen.push(&id.scheme);
+            }
+            if id.value.trim().is_empty() {
+                errors.push(format!("legal.ids[{i}].value: non-empty string required"));
+            }
         }
     }
     if !is_ascii_digits(&doc.einvoice.eas, 4) {
@@ -213,8 +228,7 @@ mod tests {
                 country: "FR".to_string(),
                 name: "ACME SAS".to_string(),
                 form: None,
-                siren: None,
-                siret: None,
+                ids: None,
                 vat: None,
             },
             einvoice: Einvoice {
@@ -286,8 +300,7 @@ mod validate_tests {
                 country: "FR".to_string(),
                 name: "ACME SAS".to_string(),
                 form: None,
-                siren: None,
-                siret: None,
+                ids: None,
                 vat: None,
             },
             einvoice: Einvoice {
@@ -330,13 +343,40 @@ mod validate_tests {
     }
 
     #[test]
-    fn bad_optional_siren_siret_formats() {
+    fn well_formed_legal_ids_pass() {
         let mut doc = valid_doc();
-        doc.legal.siren = Some("12345".to_string());
-        doc.legal.siret = Some("ABC".to_string());
+        doc.legal.ids = Some(vec![
+            LegalId { scheme: "0002".to_string(), value: "542051180".to_string() },
+            LegalId { scheme: "0009".to_string(), value: "73282932000074".to_string() },
+        ]);
+        assert_eq!(validate(&doc), Vec::<String>::new());
+    }
+
+    #[test]
+    fn legal_id_scheme_must_be_four_digits() {
+        let mut doc = valid_doc();
+        doc.legal.ids = Some(vec![LegalId { scheme: "2".to_string(), value: "542051180".to_string() }]);
         let errors = validate(&doc);
-        assert!(errors.iter().any(|e| e.starts_with("legal.siren:")));
-        assert!(errors.iter().any(|e| e.starts_with("legal.siret:")));
+        assert!(errors.iter().any(|e| e.starts_with("legal.ids[0].scheme:")), "{errors:?}");
+    }
+
+    #[test]
+    fn duplicate_legal_id_scheme_is_rejected() {
+        let mut doc = valid_doc();
+        doc.legal.ids = Some(vec![
+            LegalId { scheme: "0002".to_string(), value: "542051180".to_string() },
+            LegalId { scheme: "0002".to_string(), value: "999999999".to_string() },
+        ]);
+        let errors = validate(&doc);
+        assert!(errors.iter().any(|e| e.contains("duplicate scheme 0002")), "{errors:?}");
+    }
+
+    #[test]
+    fn the_core_knows_nothing_about_siren_lengths() {
+        // "12345" is not a SIREN, but that is PROFILE-FR's business, not the core's.
+        let mut doc = valid_doc();
+        doc.legal.ids = Some(vec![LegalId { scheme: "0002".to_string(), value: "12345".to_string() }]);
+        assert_eq!(validate(&doc), Vec::<String>::new());
     }
 
     #[test]

@@ -39,11 +39,19 @@ AFNOR XP Z12-014.
 
 ## Cohérences attendues
 
-- `legal.siren` : 9 chiffres, clé de Luhn valide.
-- `legal.siret` : 14 chiffres, clé de Luhn valide, commence par `legal.siren`.
+- `legal.ids` porte les identifiants français sous les codes ICD suivants, qui sont
+  ceux du même registre qu'`einvoice.eas` :
+
+  | Schéma | Identifiant | Règles |
+  |---|---|---|
+  | `0002` | SIREN | 9 chiffres, clé de Luhn valide. |
+  | `0009` | SIRET | 14 chiffres, clé de Luhn valide, commence par le SIREN (`0002`). |
+
+  Ces règles de longueur et de clé sont **françaises** : le format cœur ne les connaît
+  pas, il ne vérifie que la forme d'un identifiant qualifié.
 - `legal.vat` : `FR` + clé 2 chiffres + SIREN, avec
   `clé = (12 + 3 × (SIREN mod 97)) mod 97`.
-- Le premier segment d'`einvoice.address` est `legal.siren` s'il est présent.
+- Le premier segment d'`einvoice.address` est la valeur du schéma `0002` si elle est présente.
 
 Un lecteur peut signaler ces incohérences mais ne doit pas refuser le
 document pour autant (la validation structurelle du schéma fait foi) —

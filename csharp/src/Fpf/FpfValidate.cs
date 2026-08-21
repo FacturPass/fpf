@@ -30,8 +30,21 @@ public static partial class FpfCodec
         {
             if (!IsCountryCode(doc.Legal.Country)) errors.Add("legal.country: ISO 3166-1 alpha-2 code required");
             if (string.IsNullOrWhiteSpace(doc.Legal.Name)) errors.Add("legal.name: non-empty string required");
-            if (doc.Legal.Siren is { } siren && !IsAsciiDigits(siren, 9)) errors.Add("legal.siren: must be 9 digits");
-            if (doc.Legal.Siret is { } siret && !IsAsciiDigits(siret, 14)) errors.Add("legal.siret: must be 14 digits");
+            if (doc.Legal.Ids is { } ids)
+            {
+                if (ids.Count == 0) errors.Add("legal.ids: non-empty array required when present");
+                var seen = new HashSet<string>();
+                for (var i = 0; i < ids.Count; i++)
+                {
+                    var id = ids[i];
+                    if (!IsAsciiDigits(id.Scheme ?? "", 4))
+                        errors.Add($"legal.ids[{i}].scheme: 4-digit ICD scheme code required");
+                    else if (!seen.Add(id.Scheme))
+                        errors.Add($"legal.ids[{i}].scheme: duplicate scheme {id.Scheme}");
+                    if (string.IsNullOrWhiteSpace(id.Value))
+                        errors.Add($"legal.ids[{i}].value: non-empty string required");
+                }
+            }
         }
 
         if (doc.Einvoice is null)

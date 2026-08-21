@@ -49,6 +49,31 @@ export async function decode(payload) {
   return JSON.parse(new TextDecoder().decode(bytes));
 }
 
+// legal.ids carries the buyer's registration identifiers (EN 16931 BT-47), each
+// qualified by an ICD scheme code (BT-47-1) drawn from the same registry as
+// einvoice.eas. What a scheme means — 0002 is a French SIREN, 0009 a SIRET — and
+// the check digits it implies belong to the country profiles, not here: the core
+// format has no business knowing that a SIREN is nine digits.
+function idErrors(ids) {
+  if (ids === undefined) return [];
+  if (!Array.isArray(ids) || ids.length === 0) return ['legal.ids: non-empty array required when present'];
+  const errors = [];
+  const seen = new Set();
+  ids.forEach((id, i) => {
+    if (id === null || typeof id !== 'object' || Array.isArray(id)) {
+      errors.push(`legal.ids[${i}]: must be an object`);
+      return;
+    }
+    if (!/^\d{4}$/.test(id.scheme ?? '')) errors.push(`legal.ids[${i}].scheme: 4-digit ICD scheme code required`);
+    else if (seen.has(id.scheme)) errors.push(`legal.ids[${i}].scheme: duplicate scheme ${id.scheme}`);
+    else seen.add(id.scheme);
+    // A number here is the classic hand-rolled-encoder bug: a SIRET emitted as
+    // 73282932000074 loses any leading zero and breaks string comparison.
+    if (typeof id.value !== 'string' || id.value.trim() === '') errors.push(`legal.ids[${i}].value: non-empty string required`);
+  });
+  return errors;
+}
+
 export function validate(doc) {
   if (doc === null || typeof doc !== 'object' || Array.isArray(doc)) {
     return ['document: must be a JSON object'];
@@ -63,8 +88,7 @@ export function validate(doc) {
   } else {
     if (!/^[A-Z]{2}$/.test(legal.country ?? '')) errors.push('legal.country: ISO 3166-1 alpha-2 code required');
     if (typeof legal.name !== 'string' || legal.name.trim() === '') errors.push('legal.name: non-empty string required');
-    if (legal.siren !== undefined && !/^\d{9}$/.test(legal.siren)) errors.push('legal.siren: must be 9 digits');
-    if (legal.siret !== undefined && !/^\d{14}$/.test(legal.siret)) errors.push('legal.siret: must be 14 digits');
+    errors.push(...idErrors(legal.ids));
   }
 
   const einvoice = doc.einvoice;

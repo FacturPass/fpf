@@ -16,8 +16,9 @@ Le document canonique est un objet JSON validé par
 | `legal.country` | oui | — | Pays d'immatriculation, ISO 3166-1 alpha-2. Détermine le profil applicable (`FR` → profil France). EN 16931 n'a pas de terme dédié : BT-55 désigne le pays de l'adresse postale (voir `billing.country`). |
 | `legal.name` | oui | BT-44 | Raison sociale. |
 | `legal.form` | non | — | Forme juridique, texte libre. |
-| `legal.siren` | non | BT-47 | 9 chiffres. |
-| `legal.siret` | non | — | 14 chiffres. EN 16931 n'a pas de terme dédié : le SIRET sert de composant d'adressage dans `einvoice.address`. |
+| `legal.ids` | non | BT-47 | Identifiants d'immatriculation, chacun qualifié par son schéma. Tableau non vide ; un schéma ne peut pas figurer deux fois. |
+| `legal.ids[].scheme` | oui | BT-47-1 | Code ICD à 4 chiffres, **même registre qu'`einvoice.eas`**. La signification d'un code relève du profil pays. |
+| `legal.ids[].value` | oui | — | L'identifiant lui-même, **toujours une chaîne** — jamais un nombre, qui perdrait un zéro initial. |
 | `legal.vat` | non | BT-48 | N° TVA intracommunautaire. |
 | `einvoice.eas` | oui | BT-49-1 | Code schéma EAS (4 chiffres). |
 | `einvoice.address` | oui | BT-49 | Adresse électronique dans ce schéma. |
@@ -57,7 +58,7 @@ dans cet ordre exact, pour permettre une comparaison octet-à-octet entre
 langages :
 
     fpf, kind,
-    legal { country, name, form, siren, siret, vat },
+    legal { country, name, form, ids [ { scheme, value } ], vat },
     einvoice { eas, address, platform },
     billing { street, zip, city, country },
     contact { email, phone, buyerReference }

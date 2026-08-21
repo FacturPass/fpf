@@ -40,13 +40,44 @@ test('bad country, empty name', () => {
   assert.ok(errs.some((e) => e.startsWith('legal.name:')));
 });
 
-test('bad optional siren/siret formats', () => {
-  const errs = validate({
-    ...VALID,
-    legal: { ...VALID.legal, siren: '12345', siret: 'ABC' },
-  });
-  assert.ok(errs.some((e) => e.startsWith('legal.siren:')));
-  assert.ok(errs.some((e) => e.startsWith('legal.siret:')));
+const withIds = (ids) => ({ ...VALID, legal: { ...VALID.legal, ids } });
+
+test('legal.ids: a well-formed list passes', () => {
+  assert.deepEqual(
+    validate(withIds([
+      { scheme: '0002', value: '542051180' },
+      { scheme: '0009', value: '73282932000074' },
+    ])),
+    [],
+  );
+});
+
+test('legal.ids: the scheme is a 4-digit ICD code', () => {
+  const errs = validate(withIds([{ scheme: '2', value: '542051180' }]));
+  assert.ok(errs.some((e) => e.startsWith('legal.ids[0].scheme:')), errs.join(' | '));
+});
+
+test('legal.ids: the same scheme cannot appear twice', () => {
+  const errs = validate(withIds([
+    { scheme: '0002', value: '542051180' },
+    { scheme: '0002', value: '999999999' },
+  ]));
+  assert.ok(errs.some((e) => e.includes('duplicate scheme 0002')), errs.join(' | '));
+});
+
+test('legal.ids: a numeric value is rejected — identifiers are strings', () => {
+  const errs = validate(withIds([{ scheme: '0009', value: 73282932000074 }]));
+  assert.ok(errs.some((e) => e.startsWith('legal.ids[0].value:')), errs.join(' | '));
+});
+
+test('legal.ids: an empty list is rejected, an absent one is fine', () => {
+  assert.ok(validate(withIds([])).some((e) => e.startsWith('legal.ids:')));
+  assert.deepEqual(validate(VALID), []);
+});
+
+test('legal.ids: the core format knows nothing about SIREN lengths', () => {
+  // "12345" is not a SIREN, but that is PROFILE-FR's business, not the core's.
+  assert.deepEqual(validate(withIds([{ scheme: '0002', value: '12345' }])), []);
 });
 
 test('bad eas / empty address', () => {
