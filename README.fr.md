@@ -39,6 +39,7 @@ directement — lire le format, générer le format — sans dépendre de Factur
   - [`js/`](js/README.md) — JavaScript (Node ≥ 22, aucune dépendance à l'exécution).
   - [`rust/`](rust/README.md) — Rust.
   - [`csharp/`](csharp/README.md) — C#.
+  - [`pascal/`](pascal/README.md) — Free Pascal (portable vers Delphi).
 
 ## Transport
 

@@ -37,3 +37,7 @@ Free Pascal lives in two units: `fpfjson.pas` (JSON, via `fpjson`) and
 `fpfbytes.pas` (base64url and raw deflate, via `base64` and `zstream`). A Delphi
 port rewrites those two against `System.JSON`, `System.NetEncoding` and
 `System.ZLib`.
+
+Being a typed implementation, it departs from the untyped JS reference on a few
+checks that a type makes impossible to represent — see
+[Where the typed implementations legitimately differ](../CONTRIBUTING.md#where-the-typed-implementations-legitimately-differ).

@@ -35,6 +35,7 @@ generate the format — without depending on FacturPass at all.
   - [`js/`](js/README.md) — JavaScript (Node ≥ 22, zero dependencies at runtime).
   - [`rust/`](rust/README.md) — Rust.
   - [`csharp/`](csharp/README.md) — C#.
+  - [`pascal/`](pascal/README.md) — Free Pascal (portable to Delphi).
 
 ## Transport
 

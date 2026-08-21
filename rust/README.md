@@ -17,3 +17,7 @@ Tests include the shared [`test-vectors.json`](../test-vectors.json) also used b
 the JS and C# implementations — keep it in sync via
 [`js/scripts/generate-test-vectors.mjs`](../js/README.md) if you change
 `examples/*.json`.
+
+Being a typed implementation, it departs from the untyped JS reference on a few
+checks that a type makes impossible to represent — see
+[Where the typed implementations legitimately differ](../CONTRIBUTING.md#where-the-typed-implementations-legitimately-differ).
