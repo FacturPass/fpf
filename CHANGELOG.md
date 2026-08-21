@@ -1,34 +1,13 @@
-# Changelog
+## 0.0.0 (2026-08-21)
 
-All notable changes to the FPF format and its reference implementations are
-documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+### Features
 
-The format version (`"fpf": "1.0"`) and this changelog are versioned separately:
-the format version only changes when the on-the-wire document schema changes;
-tooling and implementation improvements that don't affect the format itself are
-listed here without a format version bump.
+* FPF 1.0 JSON Schema with examples validated by ajv ([e7d66a5](https://github.com/FacturPass/fpf/commit/e7d66a5a706654300dab2fdda4519c2d11f716c7))
+* FPF reference lib (encode/decode) with tests and CI ([8051269](https://github.com/FacturPass/fpf/commit/8051269748702eb0e6bcca52e6f88dbc763d59b8))
+* structural validate() in FPF lib ([ddf9f1b](https://github.com/FacturPass/fpf/commit/ddf9f1bde3cfa919608dfb4ec6bd46433f484bcc))
 
-## [Unreleased]
+### Documentation
 
-### Added
-- C# reference implementation (`csharp/`), matching the JS and Rust
-  implementations against the shared `test-vectors.json`.
-- `README.md` (English) as the primary entry point, with `README.fr.md` for the
-  French version.
-- `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, issue/PR templates.
-
-## 1.0 — 2026-08-05
-
-Initial public format and reference implementations.
-
-### Added
-- FPF 1.0 specification (`SPEC.md`) and JSON Schema (`fpf-1.0.schema.json`).
-- France profile (`PROFILE-FR.md`): EAS 0225 addressing, SIREN/SIRET/VAT
-  consistency rules.
-- JavaScript reference implementation (`js/`): `encode`, `decode`, `validate`.
-- Rust reference implementation (`rust/`): `encode`, `decode`, `validate`.
-- Multi-language repository structure, with a shared `test-vectors.json`
-  generated from `examples/*.json` and checked against every language
-  implementation in CI.
-- AGPL-3.0-or-later license for this repository's code (the FPF format itself
-  remains freely reimplementable).
+* correct legal.country EN 16931 mapping (BT-55 is the postal address country) ([1432406](https://github.com/FacturPass/fpf/commit/1432406c93c9465de38168eeb9f41b26a0127d71))
+* FPF spec, FR profile, README, AGPL license ([d3290f3](https://github.com/FacturPass/fpf/commit/d3290f339e4a517b33cf78b18bf1233b3e45054c))
+* prepare repo for public release ([#4](https://github.com/FacturPass/fpf/issues/4)) ([4b7f7d8](https://github.com/FacturPass/fpf/commit/4b7f7d8fd25899b7586ad336e97027ea9f7a6a6c))

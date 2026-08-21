@@ -1,0 +1,39 @@
+name: ci-commits
+
+# `edited` matters: the pull request title is checked below, and a title can be
+# fixed after opening. Without it the check would keep reporting a stale result.
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  # A commit-msg hook only protects contributors who installed it, and it can be
+  # skipped with --no-verify. This is what actually guards main.
+  commits:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npx commitlint --from "${{ github.event.pull_request.base.sha }}" --to "${{ github.event.pull_request.head.sha }}" --verbose
+
+  # Merges here are squashed, so the pull request title becomes the commit
+  # message on main. Two commits already on main came from titles that predate
+  # the convention and are invisible in the generated changelog as a result.
+  title:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      # The title is untrusted input: passing it through the environment keeps
+      # it out of the shell command line, where it could otherwise be injected.
+      - run: printf '%s' "$PR_TITLE" | npx --no -- commitlint --verbose
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
