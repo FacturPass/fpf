@@ -17,7 +17,7 @@ format lui-même est générique (aligné EN 16931, tout schéma EAS) ; un
 [profil France](PROFILE-FR.md) documente les règles supplémentaires propres à cette
 réforme.
 
-[**FacturPass**](https://facturpass.fr) est le site de référence qui génère des QR
+[**FacturPass**](https://facturpass.com) est le site de référence qui génère des QR
 codes FPF ; ce dépôt est le format lui-même, maintenu indépendamment afin que
 n'importe quel logiciel de caisse ou de comptabilité puisse implémenter FPF
 directement — lire le format, générer le format — sans dépendre de FacturPass.
