@@ -1,0 +1,39 @@
+name: changelog
+
+# Regenerating by hand was forgotten on the very first merge, leaving main's
+# CHANGELOG a release behind. This keeps it current without relying on anyone
+# remembering.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The changelog is built from the full history and from the version
+          # tags, neither of which a shallow clone carries.
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm run changelog
+      - name: Commit the regenerated changelog
+        run: |
+          if git diff --quiet -- CHANGELOG.md; then
+            echo "CHANGELOG.md is already up to date."
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add CHANGELOG.md
+          # A push authenticated with GITHUB_TOKEN does not trigger workflows,
+          # so this cannot loop back into itself.
+          git commit -m 'docs: regenerate CHANGELOG'
+          git push

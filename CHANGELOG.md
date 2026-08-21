@@ -1,4 +1,15 @@
-## 0.0.0 (2026-08-21)
+
+## [1.1.0](https://github.com/FacturPass/fpf/compare/v1.0.0...v1.1.0) (2026-08-21)
+
+### Features
+
+* add FPF 1.1 renaming contact.ref to contact.buyerReference (BT-10) ([#5](https://github.com/FacturPass/fpf/issues/5)) ([508cae6](https://github.com/FacturPass/fpf/commit/508cae628e0d2ed31e45ddba5daae94841cec79a))
+
+### Chores
+
+* enforce conventional commits and generate the changelog ([#6](https://github.com/FacturPass/fpf/issues/6)) ([ea2d885](https://github.com/FacturPass/fpf/commit/ea2d8853ccc0d99da7a9e0971dd4aa96da81b63b))
+
+## [1.0.0](https://github.com/FacturPass/fpf/compare/8051269748702eb0e6bcca52e6f88dbc763d59b8...v1.0.0) (2026-08-10)
 
 ### Features
 
