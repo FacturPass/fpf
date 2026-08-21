@@ -7,7 +7,7 @@ assignees: ''
 ---
 
 **Component**
-- [ ] Spec / schema (`SPEC.md`, `fpf-1.0.schema.json`, `PROFILE-FR.md`)
+- [ ] Spec / schema (`SPEC.md`, `fpf-1.1.schema.json`, `PROFILE-FR.md`)
 - [ ] `js`
 - [ ] `rust`
 - [ ] `csharp`

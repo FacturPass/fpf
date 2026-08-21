@@ -24,9 +24,8 @@ generate the format — without depending on FacturPass at all.
 
 ## Contents
 
-- [`SPEC.md`](SPEC.md) — the FPF specification, covering 1.0 and 1.1.
+- [`SPEC.md`](SPEC.md) — the FPF specification.
 - [`fpf-1.1.schema.json`](fpf-1.1.schema.json) — JSON Schema for structural validation.
-  [`fpf-1.0.schema.json`](fpf-1.0.schema.json) is kept unchanged for documents already issued.
 - [`PROFILE-FR.md`](PROFILE-FR.md) — additional rules for `legal.country: "FR"`.
 - [`examples/`](examples/) — example documents (minimal, complete, invalid).
 - [`test-vectors.json`](test-vectors.json) — shared encode/decode vectors used to keep
@@ -60,13 +59,14 @@ decode error. See [`SPEC.md`](SPEC.md) for the full document schema and field li
 
 ## Status
 
-FPF 1.1 is the current, stable version. It renames `contact.ref` to
-`contact.buyerReference`, mapped to EN 16931 **BT-10**.
+FPF 1.1 is the current, stable version — and the only one. `contact.buyerReference`,
+mapped to EN 16931 **BT-10**, is its only spelling for the buyer's own reference.
 
 **Readers must accept every published version**: a printed QR code has no expiry
-date, so 1.0 documents stay valid indefinitely. Each version accepts only its own
-key — never both — so a document is never ambiguous and a reader keys off the
-`fpf` field. Changes are tracked in [`CHANGELOG.md`](CHANGELOG.md).
+date. That rule still stands; there is simply one version to cover. A `1.0` was
+published briefly and withdrawn before a single document was handed to anyone, so
+a document carrying `"fpf": "1.0"` must be **refused**, never read. Changes are
+tracked in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Contributing
 

@@ -15,7 +15,7 @@ What would need to change: a new optional field, a new country profile, a new
 reference implementation, a behavior change in an existing one, etc.
 
 **Backward compatibility**
-Would existing FPF 1.0 documents remain valid and correctly interpreted after this
+Would existing FPF documents remain valid and correctly interpreted after this
 change? If not, explain why a version bump would be needed instead.
 
 **Alternatives considered**

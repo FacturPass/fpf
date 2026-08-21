@@ -26,10 +26,9 @@ directement — lire le format, générer le format — sans dépendre de Factur
 
 ## Contenu
 
-- [`SPEC.md`](SPEC.md) — la spécification FPF, couvrant 1.0 et 1.1.
+- [`SPEC.md`](SPEC.md) — la spécification FPF.
 - [`fpf-1.1.schema.json`](fpf-1.1.schema.json) — schéma JSON pour la validation
-  structurelle. [`fpf-1.0.schema.json`](fpf-1.0.schema.json) est conservé
-  inchangé pour les documents déjà émis.
+  structurelle.
 - [`PROFILE-FR.md`](PROFILE-FR.md) — règles supplémentaires pour
   `legal.country: "FR"`.
 - [`examples/`](examples/) — documents d'exemple (minimal, complet, invalide).
@@ -65,14 +64,16 @@ la liste des champs.
 
 ## État
 
-FPF 1.1 est la version actuelle et stable. Elle renomme `contact.ref` en
-`contact.buyerReference`, qui correspond au terme métier EN 16931 **BT-10**.
+FPF 1.1 est la version actuelle et stable — et la seule. `contact.buyerReference`,
+qui correspond au terme métier EN 16931 **BT-10**, est sa seule graphie pour la
+référence propre à l'acheteur.
 
-**Un lecteur doit accepter toutes les versions publiées** : un QR code imprimé
-n'a pas de date de péremption, les documents 1.0 restent donc valides
-indéfiniment. Chaque version n'accepte que sa propre clé, jamais les deux : un
-document n'est jamais ambigu, il suffit de lire le champ `fpf`. Les changements
-sont suivis dans [`CHANGELOG.md`](CHANGELOG.md).
+**Un lecteur doit accepter toutes les versions publiées** : un QR code imprimé n'a
+pas de date de péremption. La règle tient toujours, elle n'a simplement qu'une
+version à couvrir. Une `1.0` a été publiée brièvement puis retirée avant qu'aucun
+document ne soit remis à personne : un document portant `"fpf": "1.0"` doit être
+**refusé**, jamais lu. Les changements sont suivis dans
+[`CHANGELOG.md`](CHANGELOG.md).
 
 ## Contribuer
 

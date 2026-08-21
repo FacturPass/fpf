@@ -27,5 +27,6 @@ that could lead to two conforming implementations disagreeing) are also in scope
 
 ## Supported versions
 
-FPF 1.0 is the only published version of the format; all three reference
-implementations track it. There are no older versions receiving security fixes.
+FPF 1.1 is the only published version of the format; all three reference
+implementations track it. The withdrawn 1.0 is refused rather than read, and
+there are no older versions receiving security fixes.
