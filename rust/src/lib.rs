@@ -1,4 +1,4 @@
-//! FPF 1.0 reference implementation — encode/decode of the transport payload.
+//! FPF 1.0/1.1 reference implementation — encode/decode of the transport payload.
 //! Mirrors the JS reference implementation at ../js/lib/fpf.js.
 
 use std::io::{Read, Write};
@@ -66,6 +66,8 @@ pub struct Contact {
     pub phone: Option<String>,
     #[serde(rename = "ref", skip_serializing_if = "Option::is_none")]
     pub r#ref: Option<String>,
+    #[serde(rename = "buyerReference", skip_serializing_if = "Option::is_none")]
+    pub buyer_reference: Option<String>,
 }
 
 // `ref` is a Rust reserved keyword — the field above is named `r#ref` (raw
@@ -159,8 +161,8 @@ fn is_country_code(s: &str) -> bool {
 pub fn validate(doc: &FpfDocument) -> Vec<String> {
     let mut errors = Vec::new();
 
-    if doc.fpf != "1.0" {
-        errors.push(r#"fpf: must be "1.0""#.to_string());
+    if doc.fpf != "1.0" && doc.fpf != "1.1" {
+        errors.push(r#"fpf: must be "1.0" or "1.1""#.to_string());
     }
     if doc.kind != "buyer" {
         errors.push(r#"kind: must be "buyer""#.to_string());
@@ -186,6 +188,17 @@ pub fn validate(doc: &FpfDocument) -> Vec<String> {
     }
     if doc.einvoice.address.trim().is_empty() {
         errors.push("einvoice.address: non-empty string required".to_string());
+    }
+
+    // Each version accepts only its own contact key, so a document is never
+    // ambiguous about which one it meant.
+    if let Some(contact) = &doc.contact {
+        if doc.fpf == "1.1" && contact.r#ref.is_some() {
+            errors.push("contact.ref: renamed to contact.buyerReference in FPF 1.1".to_string());
+        }
+        if doc.fpf == "1.0" && contact.buyer_reference.is_some() {
+            errors.push("contact.buyerReference: not in FPF 1.0, use contact.ref".to_string());
+        }
     }
 
     errors

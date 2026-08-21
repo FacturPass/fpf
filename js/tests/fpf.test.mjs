@@ -53,9 +53,8 @@ test('compressed payload is smaller than raw for a full doc', async () => {
 });
 
 // --- FPF 1.1 round-trip ---
-// Cross-language vectors in test-vectors.json stay 1.0-only until the C# and
-// Rust ports land: their suites iterate every vector and would fail on a 1.1
-// document. Until then the JS reference covers 1.1 on its own.
+// test-vectors.json pins the cross-language contract; these keep the JS
+// reference honest on its own, without loading the shared file.
 
 import { readFile } from 'node:fs/promises';
 
