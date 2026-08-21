@@ -1,14 +1,20 @@
 name: changelog
 
-# Regenerating by hand was forgotten on the very first merge, leaving main's
-# CHANGELOG a release behind. This keeps it current without relying on anyone
-# remembering.
+# The changelog has to be generated from main's history, not from a branch:
+# merges here are squashed, so the message that ends up in the changelog only
+# exists once the pull request has landed.
 on:
   push:
     branches: [main]
 
 permissions:
   contents: write
+  pull-requests: write
+
+# A second push while this is running would race on the same branch.
+concurrency:
+  group: changelog
+  cancel-in-progress: true
 
 jobs:
   regenerate:
@@ -16,6 +22,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          # A pull request opened with the default GITHUB_TOKEN triggers no
+          # workflows, so its checks would never report and required checks
+          # would block the merge forever. CHANGELOG_TOKEN is a fine-grained
+          # PAT (Contents + Pull requests, read and write) and behaves like a
+          # human's. Falling back keeps the workflow working without it — the
+          # pull request simply opens without checks.
+          token: ${{ secrets.CHANGELOG_TOKEN || github.token }}
           # The changelog is built from the full history and from the version
           # tags, neither of which a shallow clone carries.
           fetch-depth: 0
@@ -24,16 +37,32 @@ jobs:
           node-version: 22
       - run: npm install
       - run: npm run changelog
-      - name: Commit the regenerated changelog
+      - name: Open or update the changelog pull request
+        env:
+          GH_TOKEN: ${{ secrets.CHANGELOG_TOKEN || github.token }}
         run: |
           if git diff --quiet -- CHANGELOG.md; then
             echo "CHANGELOG.md is already up to date."
             exit 0
           fi
+
+          BRANCH=chore/changelog
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git checkout -B "$BRANCH"
           git add CHANGELOG.md
-          # A push authenticated with GITHUB_TOKEN does not trigger workflows,
-          # so this cannot loop back into itself.
           git commit -m 'docs: regenerate CHANGELOG'
-          git push
+          # The branch is owned by this workflow and rebuilt from main every
+          # run, so overwriting it is intended rather than a lost update.
+          git push --force origin "$BRANCH"
+
+          if [ -z "$(gh pr list --head "$BRANCH" --state open --json number --jq '.[0].number')" ]; then
+            gh pr create --base main --head "$BRANCH" \
+              --title 'docs: regenerate CHANGELOG' \
+              --body 'Regenerated from the commit history by the changelog workflow.
+
+          Pushing straight to main would need a bypass on the branch ruleset, which
+          the GITHUB_TOKEN cannot be granted — it is neither a role, a team, an app
+          nor a deploy key. Going through a pull request keeps the protection intact
+          and needs no extra secret.'
+          fi
