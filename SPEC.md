@@ -89,3 +89,60 @@ Un intégrateur qui veut la validation complète utilise le schéma.
 3. Valider (schéma ou `validate()`).
 4. Utiliser `einvoice.eas` + `einvoice.address` pour adresser la facture,
    `legal.*` pour les mentions obligatoires.
+
+## Conformité
+
+« Compatible FPF » n'est pas une mention libre : elle désigne un ou plusieurs
+des trois rôles ci-dessous, chacun avec ses obligations. Un logiciel peut n'en
+tenir qu'un — la plupart des logiciels de caisse ne seront jamais que lecteurs.
+
+### Lecteur
+
+Décode un pass et en extrait l'identité de l'acheteur. Il **doit** :
+
+- accepter les préfixes `1.` et `2.`, et **rejeter** tout autre préfixe au lieu
+  de tenter de deviner ;
+- valider le document, par le schéma ou par `validate()` — le schéma faisant foi ;
+- accepter toutes les versions publiées, et refuser une version retirée plutôt
+  que de la lire approximativement ;
+- traiter tout identifiant comme une **chaîne**, jamais comme un nombre ;
+- ne jamais découper `einvoice.address` sur `_` par un `split` naïf : ce
+  caractère est à la fois séparateur et caractère autorisé (voir
+  [`PROFILE-FR.md`](PROFILE-FR.md) pour l'algorithme correct).
+
+### Émetteur
+
+Produit des pass. Il **doit** :
+
+- écrire dans la version la plus récente ;
+- omettre toute clé optionnelle vide — jamais `""` ni `null` ;
+- qualifier chaque identifiant de `legal.ids` par son code de schéma ;
+- respecter l'ordre canonique des clés pour le transport `1.` (voir Transport).
+
+### Récepteur d'API
+
+Accepte un payload FPF **tel quel** en entrée de sa propre API, et en extrait
+l'identité sans exiger de son appelant qu'il remappe les champs au préalable.
+Ce rôle concerne surtout les plateformes agréées et les API de dépôt de factures.
+
+### Vecteurs de test
+
+Quel que soit le rôle, une implémentation conforme passe
+[`test-vectors.json`](test-vectors.json) :
+
+| Bloc | Attendu |
+|---|---|
+| `vectors[]` | `payload_raw` et `payload_deflate` décodent vers le document `example` ; un émetteur reproduit `payload_raw` **octet pour octet**. |
+| `decode_failures[]` | `payload` est **rejeté** au décodage. |
+| `validate_failures[]` | le document `example` produit au moins une erreur de validation. |
+
+Le transport `2.` n'est vérifié qu'au décodage : deux implémentations de deflate
+peuvent produire des octets différents pour un même document.
+
+### Se déclarer
+
+La déclaration se fait sur l'honneur, par une
+[issue de déclaration de compatibilité](https://github.com/FacturPass/fpf/issues/new?template=compatibility-declaration.md).
+Rien n'est vérifié — ce que vous déclarez est ce que les intégrateurs croiront.
+Les déclarations sont listées sur
+[facturpass.com/implementations.html](https://facturpass.com/implementations.html).
