@@ -4,6 +4,10 @@
 
 * stop dropping commits made after the latest tag from the changelog ([#9](https://github.com/FacturPass/fpf/issues/9)) ([b7a78c4](https://github.com/FacturPass/fpf/commit/b7a78c4bb031aaede64b25a5ba9d95c07fe18600))
 
+### Documentation
+
+* regenerate CHANGELOG ([#10](https://github.com/FacturPass/fpf/issues/10)) ([a88552a](https://github.com/FacturPass/fpf/commit/a88552a64b7a325baba2e300c34bdfe2e18aa21f))
+
 ### Continuous Integration
 
 * open a pull request for the changelog instead of pushing to main ([#8](https://github.com/FacturPass/fpf/issues/8)) ([75b6a25](https://github.com/FacturPass/fpf/commit/75b6a25c2c62c8976e55b49b1026ce891eef1db9))
