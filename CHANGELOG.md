@@ -1,5 +1,9 @@
 ## [1.2.0](https://github.com/FacturPass/fpf/compare/v1.1.0...v1.2.0) (2026-08-21)
 
+### Bug Fixes
+
+* stop dropping commits made after the latest tag from the changelog ([#9](https://github.com/FacturPass/fpf/issues/9)) ([b7a78c4](https://github.com/FacturPass/fpf/commit/b7a78c4bb031aaede64b25a5ba9d95c07fe18600))
+
 ### Continuous Integration
 
 * open a pull request for the changelog instead of pushing to main ([#8](https://github.com/FacturPass/fpf/issues/8)) ([75b6a25](https://github.com/FacturPass/fpf/commit/75b6a25c2c62c8976e55b49b1026ce891eef1db9))
