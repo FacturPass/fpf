@@ -1,0 +1,18 @@
+name: ci-java
+on:
+  push:
+    branches: [main]
+    paths: ['java/**', 'examples/**', 'fpf-1.1.schema.json', 'test-vectors.json']
+  pull_request:
+    paths: ['java/**', 'examples/**', 'fpf-1.1.schema.json', 'test-vectors.json']
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - run: mvn -B test -f java/pom.xml
