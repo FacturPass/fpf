@@ -26,7 +26,6 @@ type
     procedure TheCoreKnowsNothingAboutSirenLengths;
     procedure EmptyIdValueIsRejected;
     procedure BadEasAndEmptyAddress;
-    procedure LegacyContactRefIsNamedAsARename;
   end;
 
 implementation
@@ -185,15 +184,6 @@ begin
   Errors := FpfValidate(Doc);
   AssertHasError(Errors, 'einvoice.eas: 4-digit EAS scheme code required');
   AssertHasError(Errors, 'einvoice.address: non-empty string required');
-end;
-
-procedure TValidateTest.LegacyContactRefIsNamedAsARename;
-var
-  Doc: TFpfDocument;
-begin
-  Doc := ValidDoc;
-  Doc.Contact.Ref := 'EMP-042';
-  AssertHasError(FpfValidate(Doc), 'contact.ref: renamed to contact.buyerReference in FPF 1.1');
 end;
 
 initialization

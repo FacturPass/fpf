@@ -57,14 +57,6 @@ public static partial class FpfCodec
             if (string.IsNullOrWhiteSpace(doc.Einvoice.Address)) errors.Add("einvoice.address: non-empty string required");
         }
 
-        if (doc.Contact is { } contact)
-        {
-            // The withdrawn 1.0 spelled this contact.ref; naming the rename beats
-            // letting the schema call it an unknown property.
-            if (contact.Ref is not null)
-                errors.Add("contact.ref: renamed to contact.buyerReference in FPF 1.1");
-        }
-
         return errors;
     }
 }

@@ -37,7 +37,6 @@ const output = {
   ],
   validate_failures: [
     { name: 'missing-einvoice', example: 'invalid-missing-einvoice.json' },
-    { name: 'legacy-ref', example: 'invalid-legacy-ref.json' },
     { name: 'version-1.0-withdrawn', example: 'invalid-version-1.0.json' },
   ],
 };

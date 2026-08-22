@@ -97,9 +97,3 @@ test('a 1.0 document is rejected: the version was withdrawn before anyone used i
 test('contact.buyerReference is accepted', () => {
   assert.deepEqual(validate({ ...VALID, contact: { buyerReference: 'EMP-042' } }), []);
 });
-
-test('contact.ref is named as a rename, not left to the schema', () => {
-  assert.deepEqual(validate({ ...VALID, contact: { ref: 'EMP-042' } }), [
-    'contact.ref: renamed to contact.buyerReference in FPF 1.1',
-  ]);
-});

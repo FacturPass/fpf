@@ -71,16 +71,9 @@ pub struct Contact {
     pub email: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub phone: Option<String>,
-    #[serde(rename = "ref", skip_serializing_if = "Option::is_none")]
-    pub r#ref: Option<String>,
     #[serde(rename = "buyerReference", skip_serializing_if = "Option::is_none")]
     pub buyer_reference: Option<String>,
 }
-
-// `ref` is a Rust reserved keyword — the field above is named `r#ref` (raw
-// identifier) and explicitly renamed to the JSON key "ref" via #[serde(rename = "ref")].
-// A `///` doc comment is deliberately not used here: with a blank line before
-// the next item, it would attach to `FpfError` below instead of to `Contact`.
 
 #[derive(Debug)]
 pub enum FpfError {
@@ -203,14 +196,6 @@ pub fn validate(doc: &FpfDocument) -> Vec<String> {
     }
     if doc.einvoice.address.trim().is_empty() {
         errors.push("einvoice.address: non-empty string required".to_string());
-    }
-
-    if let Some(contact) = &doc.contact {
-        // The withdrawn 1.0 spelled this contact.ref; naming the rename beats
-        // letting the schema call it an unknown property.
-        if contact.r#ref.is_some() {
-            errors.push("contact.ref: renamed to contact.buyerReference in FPF 1.1".to_string());
-        }
     }
 
     errors
@@ -394,18 +379,5 @@ mod validate_tests {
         let mut doc = valid_doc();
         doc.fpf = "1.0".to_string();
         assert_eq!(validate(&doc), vec![r#"fpf: must be "1.1""#.to_string()]);
-    }
-
-    #[test]
-    fn legacy_contact_ref_is_named_as_a_rename() {
-        let mut doc = valid_doc();
-        doc.contact = Some(Contact {
-            r#ref: Some("EMP-042".to_string()),
-            ..Default::default()
-        });
-        assert_eq!(
-            validate(&doc),
-            vec!["contact.ref: renamed to contact.buyerReference in FPF 1.1".to_string()]
-        );
     }
 }

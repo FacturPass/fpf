@@ -25,7 +25,7 @@ Le document canonique est un objet JSON validé par
 | `einvoice.platform` | non | — | Nom de la plateforme de réception. **Informatif et volatile** : il change dès que l'entreprise change de plateforme, alors qu'un lien FacturPass est permanent. L'annuaire central fait foi ; préférez l'omettre. |
 | `billing.*` | non | BG-8 | Adresse postale de facturation. |
 | `contact.email`, `contact.phone` | non | — | Contact de facturation. |
-| `contact.buyerReference` | non | BT-10 | Référence propre à l'acheteur (bon de commande, centre de coût), que le vendeur reporte sur la facture. Nommée `contact.ref` par la 1.0, retirée — voir Versionnement. |
+| `contact.buyerReference` | non | BT-10 | Référence propre à l'acheteur (bon de commande, centre de coût), que le vendeur reporte sur la facture. |
 
 Les clés optionnelles absentes sont **omises** (jamais `""` ni `null`).
 
@@ -37,10 +37,9 @@ décodable — et un producteur écrit toujours dans la plus récente.
 
 Aujourd'hui il n'en existe qu'une, `1.1`, décrite par
 [`fpf-1.1.schema.json`](fpf-1.1.schema.json). La `1.0` a été publiée brièvement
-puis **retirée avant qu'aucun document ne soit remis à personne** : elle nommait
-`contact.ref` ce que la `1.1` nomme `contact.buyerReference` (BT-10). Un document
+puis **retirée avant qu'aucun document ne soit remis à personne**. Un document
 portant `"fpf": "1.0"` doit être **refusé**, jamais lu — une lecture approximative
-de `contact.ref` serait pire qu'un refus net.
+serait pire qu'un refus net.
 
 ## Transport
 

@@ -103,11 +103,4 @@ public class FpfValidateTests
         var doc = ValidDoc() with { Fpf = "1.0" };
         Assert.Contains(FpfCodec.Validate(doc), e => e == "fpf: must be \"1.1\"");
     }
-
-    [Fact]
-    public void LegacyContactRefIsNamedAsARename()
-    {
-        var doc = ValidDoc() with { Contact = new Contact { Ref = "EMP-042" } };
-        Assert.Contains(FpfCodec.Validate(doc), e => e == "contact.ref: renamed to contact.buyerReference in FPF 1.1");
-    }
 }

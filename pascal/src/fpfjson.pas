@@ -76,14 +76,11 @@ end;
 function ContactToJson(const Contact: TFpfContact): TJSONObject;
 begin
   Result := nil;
-  if (Contact.Email = '') and (Contact.Phone = '') and (Contact.Ref = '') and (Contact.BuyerReference = '') then
+  if (Contact.Email = '') and (Contact.Phone = '') and (Contact.BuyerReference = '') then
     Exit;
   Result := TJSONObject.Create;
   AddIfSet(Result, 'email', Contact.Email);
   AddIfSet(Result, 'phone', Contact.Phone);
-  // Declaration order matters: fpjson emits keys in insertion order, and the
-  // two spellings are mutually exclusive, so the canonical order holds.
-  AddIfSet(Result, 'ref', Contact.Ref);
   AddIfSet(Result, 'buyerReference', Contact.BuyerReference);
 end;
 
@@ -227,7 +224,6 @@ begin
       Node := TJSONObject(Ids);
       Result.Contact.Email := OptionalString(Node, 'email');
       Result.Contact.Phone := OptionalString(Node, 'phone');
-      Result.Contact.Ref := OptionalString(Node, 'ref');
       Result.Contact.BuyerReference := OptionalString(Node, 'buyerReference');
     end;
   finally

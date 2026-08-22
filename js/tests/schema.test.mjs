@@ -27,10 +27,6 @@ test('additional top-level properties are rejected', () => {
   assert.equal(check({ fpf: '1.1', kind: 'buyer', legal: { country: 'FR', name: 'X' }, einvoice: { eas: '0225', address: '1' }, extra: true }), false);
 });
 
-test('the withdrawn contact.ref key is rejected', async () => {
-  assert.equal(check(await loadJson('../../examples/invalid-legacy-ref.json')), false);
-});
-
 test('a 1.0 document is rejected by the schema too', async () => {
   assert.equal(check(await loadJson('../../examples/invalid-version-1.0.json')), false);
 });

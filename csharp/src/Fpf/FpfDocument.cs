@@ -77,11 +77,6 @@ public sealed record Contact
 {
     [JsonPropertyName("email")] public string? Email { get; init; }
     [JsonPropertyName("phone")] public string? Phone { get; init; }
-    // "buyerReference" (EN 16931 BT-10) is the only spelling. "ref" is kept so the
-    // validator can name the rename for anyone who read stale documentation — the
-    // withdrawn 1.0 used it. Declaration order matters: System.Text.Json emits
-    // properties in this order, and the two are mutually exclusive, so the
-    // canonical key order holds.
-    [JsonPropertyName("ref")] public string? Ref { get; init; }
+    // "buyerReference" (EN 16931 BT-10) is the only spelling.
     [JsonPropertyName("buyerReference")] public string? BuyerReference { get; init; }
 }

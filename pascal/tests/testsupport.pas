@@ -74,7 +74,6 @@ begin
   Test.AssertEquals(Context + ' billing.country', Expected.Billing.Country, Actual.Billing.Country);
   Test.AssertEquals(Context + ' contact.email', Expected.Contact.Email, Actual.Contact.Email);
   Test.AssertEquals(Context + ' contact.phone', Expected.Contact.Phone, Actual.Contact.Phone);
-  Test.AssertEquals(Context + ' contact.ref', Expected.Contact.Ref, Actual.Contact.Ref);
   Test.AssertEquals(Context + ' contact.buyerReference', Expected.Contact.BuyerReference, Actual.Contact.BuyerReference);
 end;
 

@@ -58,10 +58,7 @@ type
   TFpfContact = record
     Email: string;
     Phone: string;
-    // "buyerReference" (EN 16931 BT-10) is the only spelling. Ref exists so the
-    // validator can name the rename for anyone who read stale documentation —
-    // the withdrawn 1.0 used it.
-    Ref: string;
+    // "buyerReference" (EN 16931 BT-10) is the only spelling.
     BuyerReference: string;
   end;
 
@@ -242,10 +239,6 @@ begin
   if Trim(Doc.Einvoice.Address) = '' then
     Add(Result, 'einvoice.address: non-empty string required');
 
-  // The withdrawn 1.0 spelled this contact.ref; naming the rename beats
-  // letting the schema call it an unknown property.
-  if Doc.Contact.Ref <> '' then
-    Add(Result, 'contact.ref: renamed to contact.buyerReference in FPF 1.1');
 end;
 
 end.
