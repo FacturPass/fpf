@@ -9,11 +9,13 @@
 ### Features
 
 * add a Free Pascal reference implementation and drop the contact.ref diagnostic ([#26](https://github.com/FacturPass/fpf/issues/26)) ([e7c6f33](https://github.com/FacturPass/fpf/commit/e7c6f33c859364b50c5c30ddfe29d2beb33700b5))
+* add a Java reference implementation ([#28](https://github.com/FacturPass/fpf/issues/28)) ([f51088e](https://github.com/FacturPass/fpf/commit/f51088ed538c1e9fb12c3c8c5ae178369685ca52))
 * carry legal identifiers as scheme-qualified ids ([#23](https://github.com/FacturPass/fpf/issues/23)) ([210aaac](https://github.com/FacturPass/fpf/commit/210aaaccef3be176bd712d5d754bc7e3a615462b))
 * withdraw FPF 1.0 ([#21](https://github.com/FacturPass/fpf/issues/21)) ([d048641](https://github.com/FacturPass/fpf/commit/d048641d68c0874433f75a470861f72427598f40))
 
 ### Bug Fixes
 
+* correct package metadata left behind by the format and the repository ([#29](https://github.com/FacturPass/fpf/issues/29)) ([acc58f9](https://github.com/FacturPass/fpf/commit/acc58f9d30290025f7fe8b406f9afa8e43d13090))
 * drop ignoreCommits, which broke every changelog run ([#13](https://github.com/FacturPass/fpf/issues/13)) ([f3d51c9](https://github.com/FacturPass/fpf/commit/f3d51c950aa7dbdc80778941dccf18c67f1412ef))
 * keep the changelog from narrating its own upkeep ([#15](https://github.com/FacturPass/fpf/issues/15)) ([d1b61d7](https://github.com/FacturPass/fpf/commit/d1b61d751461710d8f421dda31ace1c437f5ae6c)), closes [#20](https://github.com/FacturPass/fpf/issues/20)
 * stop dropping commits made after the latest tag from the changelog ([#9](https://github.com/FacturPass/fpf/issues/9)) ([b7a78c4](https://github.com/FacturPass/fpf/commit/b7a78c4bb031aaede64b25a5ba9d95c07fe18600))
