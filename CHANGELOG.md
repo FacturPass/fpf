@@ -1,12 +1,14 @@
-## [1.2.0](https://github.com/FacturPass/fpf/compare/v1.1.0...v1.2.0) (2026-08-21)
+## [1.2.0](https://github.com/FacturPass/fpf/compare/v1.1.0...v1.2.0) (2026-08-22)
 
 ### ⚠ BREAKING CHANGES
 
+* add a Free Pascal reference implementation and drop the contact.ref diagnostic (#26)
 * carry legal identifiers as scheme-qualified ids (#23)
 * withdraw FPF 1.0 (#21)
 
 ### Features
 
+* add a Free Pascal reference implementation and drop the contact.ref diagnostic ([#26](https://github.com/FacturPass/fpf/issues/26)) ([e7c6f33](https://github.com/FacturPass/fpf/commit/e7c6f33c859364b50c5c30ddfe29d2beb33700b5))
 * carry legal identifiers as scheme-qualified ids ([#23](https://github.com/FacturPass/fpf/issues/23)) ([210aaac](https://github.com/FacturPass/fpf/commit/210aaaccef3be176bd712d5d754bc7e3a615462b))
 * withdraw FPF 1.0 ([#21](https://github.com/FacturPass/fpf/issues/21)) ([d048641](https://github.com/FacturPass/fpf/commit/d048641d68c0874433f75a470861f72427598f40))
 
