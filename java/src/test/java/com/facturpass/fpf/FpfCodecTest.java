@@ -1,6 +1,7 @@
 package com.facturpass.fpf;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -67,6 +68,63 @@ class FpfCodecTest {
         int n = inflater.inflate(out);
         inflater.end();
         assertEquals(MINIMAL_JSON, new String(out, 0, n, StandardCharsets.UTF_8));
+    }
+
+    private static void assertDecodeFails(String payload, FpfException.Kind expected, String why) {
+        FpfException e = assertThrows(FpfException.class, () -> Fpf.decode(payload), why);
+        assertEquals(expected, e.kind, why + " (message: " + e.getMessage() + ")");
+    }
+
+    @Test
+    void decodeRejectsAnUnknownPrefix() {
+        assertDecodeFails("9.abcdef", FpfException.Kind.UNKNOWN_PREFIX,
+                "an unknown prefix must be refused, not guessed at");
+    }
+
+    @Test
+    void decodeRejectsCorruptedBase64() {
+        assertDecodeFails("1.!!!!", FpfException.Kind.BASE64, "corrupted base64 must be refused");
+    }
+
+    @Test
+    void decodeRejectsATruncatedDeflatePayload() {
+        assertDecodeFails("2.YWJj", FpfException.Kind.INFLATE, "a truncated deflate payload must be refused");
+    }
+
+    @Test
+    void decodeRejectsInvalidJson() {
+        String payload = "1." + Base64.getUrlEncoder().withoutPadding()
+                .encodeToString("{not json".getBytes(StandardCharsets.UTF_8));
+        assertDecodeFails(payload, FpfException.Kind.JSON, "invalid JSON must be refused");
+    }
+
+    @Test
+    void decodeRejectsAMissingRequiredKey() {
+        String payload = "1." + Base64.getUrlEncoder().withoutPadding()
+                .encodeToString("{\"fpf\":\"1.1\",\"kind\":\"buyer\"}".getBytes(StandardCharsets.UTF_8));
+        assertDecodeFails(payload, FpfException.Kind.JSON,
+                "a document without legal and einvoice must not decode into a half-filled record");
+    }
+
+    @Test
+    void decodeKeepsALeadingZeroInAnIdentifier() {
+        // The classic hand-rolled-decoder bug: an identifier read as a number
+        // loses its leading zero and stops comparing equal to its own string.
+        String json = "{\"fpf\":\"1.1\",\"kind\":\"buyer\",\"legal\":{\"country\":\"FR\",\"name\":\"ACME SAS\","
+                + "\"ids\":[{\"scheme\":\"0009\",\"value\":\"07282932000074\"}]},"
+                + "\"einvoice\":{\"eas\":\"0225\",\"address\":\"542051180\"}}";
+        String payload = "1." + Base64.getUrlEncoder().withoutPadding()
+                .encodeToString(json.getBytes(StandardCharsets.UTF_8));
+        FpfDocument doc = Fpf.decode(payload);
+        assertEquals(1, doc.legal().ids().size());
+        assertEquals("0009", doc.legal().ids().get(0).scheme());
+        assertEquals("07282932000074", doc.legal().ids().get(0).value());
+    }
+
+    @Test
+    void decodeReadsAPayloadProducedByTheJsImplementation() {
+        FpfDocument doc = Fpf.decode(MINIMAL_RAW);
+        assertEquals(minimalDoc(), doc);
     }
 
     @Test

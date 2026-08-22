@@ -170,4 +170,97 @@ public final class Fpf {
     private static FpfException missing(String field) {
         return new FpfException(FpfException.Kind.JSON, "FPF: JSON error: missing field `" + field + "`");
     }
+
+    private static boolean isAsciiDigits(String s, int length) {
+        if (s == null || s.length() != length) {
+            return false;
+        }
+        for (int i = 0; i < length; i++) {
+            if (s.charAt(i) < '0' || s.charAt(i) > '9') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean isCountryCode(String s) {
+        if (s == null || s.length() != 2) {
+            return false;
+        }
+        return s.charAt(0) >= 'A' && s.charAt(0) <= 'Z' && s.charAt(1) >= 'A' && s.charAt(1) <= 'Z';
+    }
+
+    private static boolean isBlank(String s) {
+        return s == null || s.trim().isEmpty();
+    }
+
+    /**
+     * Structural and semantic validation, mirroring the Rust and JS references'
+     * {@code validate()}.
+     *
+     * <p>Must tolerate a hand-built document whose {@code legal} or
+     * {@code einvoice} is null: Java, like C# and unlike Rust, cannot stop a
+     * record component from being null. A payload missing those keys never gets
+     * this far — {@link #decode} refuses it.
+     */
+    public static List<String> validate(FpfDocument doc) {
+        List<String> errors = new ArrayList<>();
+
+        if (!"1.1".equals(doc.fpf())) {
+            errors.add("fpf: must be \"1.1\"");
+        }
+        if (!"buyer".equals(doc.kind())) {
+            errors.add("kind: must be \"buyer\"");
+        }
+
+        if (doc.legal() == null) {
+            errors.add("legal: required object");
+        } else {
+            if (!isCountryCode(doc.legal().country())) {
+                errors.add("legal.country: ISO 3166-1 alpha-2 code required");
+            }
+            if (isBlank(doc.legal().name())) {
+                errors.add("legal.name: non-empty string required");
+            }
+            validateIds(doc.legal().ids(), errors);
+        }
+
+        if (doc.einvoice() == null) {
+            errors.add("einvoice: required object");
+        } else {
+            if (!isAsciiDigits(doc.einvoice().eas(), 4)) {
+                errors.add("einvoice.eas: 4-digit EAS scheme code required");
+            }
+            if (isBlank(doc.einvoice().address())) {
+                errors.add("einvoice.address: non-empty string required");
+            }
+        }
+
+        return errors;
+    }
+
+    private static void validateIds(List<LegalId> ids, List<String> errors) {
+        if (ids == null) {
+            return;
+        }
+        if (ids.isEmpty()) {
+            errors.add("legal.ids: non-empty array required when present");
+        }
+        Set<String> seen = new HashSet<>();
+        for (int i = 0; i < ids.size(); i++) {
+            LegalId id = ids.get(i);
+            String scheme = id == null ? null : id.scheme();
+            if (!isAsciiDigits(scheme, 4)) {
+                errors.add("legal.ids[" + i + "].scheme: 4-digit ICD scheme code required");
+            } else if (!seen.add(scheme)) {
+                errors.add("legal.ids[" + i + "].scheme: duplicate scheme " + scheme);
+            }
+            // A number here is the classic hand-rolled-encoder bug: a SIRET
+            // emitted as 73282932000074 loses any leading zero and breaks
+            // string comparison.
+            if (id == null || isBlank(id.value())) {
+                errors.add("legal.ids[" + i + "].value: non-empty string required");
+            }
+        }
+    }
 }
