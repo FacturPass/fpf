@@ -7,7 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Fpf</RootNamespace>
     <PackageId>Fpf</PackageId>
-    <Description>FacturPass Format (FPF) 1.0 reference implementation</Description>
+    <Description>FacturPass Format (FPF) 1.1 reference implementation</Description>
     <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
   </PropertyGroup>
 

@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "license": "AGPL-3.0-or-later",
-  "description": "Repository-level tooling only. The reference implementations live in js/, rust/ and csharp/ and carry their own dependencies.",
+  "description": "Repository-level tooling only. Each reference implementation lives in its own directory and carries its own dependencies.",
   "scripts": {
     "prepare": "husky",
     "changelog": "conventional-changelog -n ./changelog.config.js -i CHANGELOG.md -s -r 0"
