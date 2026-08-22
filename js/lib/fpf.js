@@ -2,8 +2,7 @@
 // Works unchanged in browsers (>= 2023) and Node >= 22.
 
 // 1.1 is the only version. 1.0 was published briefly and withdrawn before any
-// document was ever handed out, so it is refused rather than read — a wrong
-// reading of contact.ref would be worse than a clean refusal.
+// document was ever handed out, so it is refused rather than read.
 const VERSIONS = ['1.1'];
 
 const PREFIX_RAW = '1.';
@@ -99,13 +98,5 @@ export function validate(doc) {
     if (typeof einvoice.address !== 'string' || einvoice.address.trim() === '') errors.push('einvoice.address: non-empty string required');
   }
 
-  // The withdrawn 1.0 spelled this contact.ref. The schema already refuses the
-  // key via additionalProperties, but only as "additional property not
-  // allowed"; naming the rename costs two lines and saves an integrator who
-  // read stale documentation.
-  const contact = doc.contact;
-  if (contact !== null && typeof contact === 'object' && contact.ref !== undefined) {
-    errors.push('contact.ref: renamed to contact.buyerReference in FPF 1.1');
-  }
   return errors;
 }

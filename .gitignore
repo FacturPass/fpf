@@ -5,3 +5,9 @@ obj/
 
 # Repo-level tooling (commitlint, husky, changelog) installed at the root.
 /node_modules/
+
+# Free Pascal build artifacts
+pascal/**/*.ppu
+pascal/**/*.o
+pascal/tests/fpftests
+pascal/tests/fpftests.exe

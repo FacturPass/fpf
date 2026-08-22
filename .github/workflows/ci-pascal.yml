@@ -1,0 +1,15 @@
+name: ci-pascal
+on:
+  push:
+    branches: [main]
+    paths: ['pascal/**', 'examples/**', 'fpf-1.1.schema.json', 'test-vectors.json']
+  pull_request:
+    paths: ['pascal/**', 'examples/**', 'fpf-1.1.schema.json', 'test-vectors.json']
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y fpc
+      - run: fpc -Fupascal/src -Fupascal/tests -opascal/tests/fpftests pascal/tests/fpftests.lpr
+      - run: pascal/tests/fpftests --format=plain --all
