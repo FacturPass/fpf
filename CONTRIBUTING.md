@@ -10,9 +10,9 @@ changes should keep it that way.
 - [`examples/`](examples/) and [`test-vectors.json`](test-vectors.json) — shared
   fixtures used by every language implementation.
 - [`js/`](js/README.md), [`rust/`](rust/README.md), [`csharp/`](csharp/README.md),
-  [`pascal/`](pascal/README.md) — one reference implementation per language, each with
-  its own tests and CI workflow (only the workflow for the directory you touched runs
-  on your PR).
+  [`pascal/`](pascal/README.md), [`java/`](java/README.md) — one reference implementation
+  per language, each with its own tests and CI workflow (only the workflow for the
+  directory you touched runs on your PR).
 
 ## Changing the format (spec or schema)
 
@@ -35,7 +35,7 @@ to `"1.1"`.
 3. Add or update tests in the language you're changing (see that language's
    `README.md` for how to run them) and make sure the shared test vectors pass in
    *every* implementation, not just the one you edited.
-4. Keep the four implementations behaviorally identical: same validation errors,
+4. Keep the five implementations behaviorally identical: same validation errors,
    same encode/decode output for the same input. If you find a divergence, treat it
    as a bug in whichever implementation disagrees with `SPEC.md`.
 
@@ -46,19 +46,20 @@ each language uses to get there. The untyped JS reference can check things a typ
 one cannot even represent, so the following differences are expected and must not be
 "fixed" by making one implementation lie:
 
-| Behavior | JS | Rust | C# | Pascal |
-|---|---|---|---|---|
-| Required key missing at decode | parsed, reported later by `validate` | decode fails (serde) | decode fails for the four top-level keys; a missing `legal.country` surfaces in `validate` | decode fails |
-| Decode error identity | one branded error (unknown prefix); base64, inflate and JSON surface as native errors | four `FpfError` variants | one `FpfException` | four `EFpfError` kinds |
-| Empty optional omitted | the caller's responsibility | carried by the type | carried by the type | carried by the type (`''` means absent) |
-| `legal:` / `einvoice: required object` | emitted | not representable | emitted for a hand-built document | not representable |
-| `document: must be a JSON object` | emitted | not representable | not representable | not representable |
+| Behavior | JS | Rust | C# | Pascal | Java |
+|---|---|---|---|---|---|
+| Required key missing at decode | parsed, reported later by `validate` | decode fails (serde) | decode fails for the four top-level keys; a missing `legal.country` surfaces in `validate` | decode fails | decode fails |
+| Decode error identity | one branded error (unknown prefix); base64, inflate and JSON surface as native errors | four `FpfError` variants | one `FpfException` | four `EFpfError` kinds | four `FpfException.Kind` values |
+| Empty optional omitted | the caller's responsibility | carried by the type | carried by the type | carried by the type (`''` means absent) | carried by the type (`null` means absent) |
+| `legal:` / `einvoice: required object` | emitted | not representable | emitted for a hand-built document | not representable | emitted for a hand-built document |
+| `document: must be a JSON object` | emitted | not representable | not representable | not representable | not representable |
 
 "Not representable" is not dead code: the line that would emit the message is not
 written at all, because no input can reach it. `FpfDocument.legal` is a `Legal` and
-not an `Option<Legal>` in Rust, an always-present record field in Pascal. C# is the
-exception only because it declares non-nullability that its runtime does not
-enforce, so the check still has a case in which it fires.
+not an `Option<Legal>` in Rust, an always-present record field in Pascal. C# and Java
+are the exceptions: a C# record declares non-nullability its runtime does not enforce,
+and a Java record component can simply hold null, so in both the check still has a case
+in which it fires.
 
 Nothing is lost: a payload missing `legal` fails to decode in Rust and Pascal
 instead of producing `legal: required object`, and a hand-built document with an

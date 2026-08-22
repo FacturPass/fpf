@@ -11,3 +11,6 @@ pascal/**/*.ppu
 pascal/**/*.o
 pascal/tests/fpftests
 pascal/tests/fpftests.exe
+
+# Maven build output
+java/target/

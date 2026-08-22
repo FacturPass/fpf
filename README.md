@@ -36,6 +36,7 @@ generate the format — without depending on FacturPass at all.
   - [`rust/`](rust/README.md) — Rust.
   - [`csharp/`](csharp/README.md) — C#.
   - [`pascal/`](pascal/README.md) — Free Pascal (portable to Delphi).
+  - [`java/`](java/README.md) — Java 17.
 
 ## Transport
 
