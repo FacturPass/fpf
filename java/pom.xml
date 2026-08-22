@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.facturpass</groupId>
+  <artifactId>fpf</artifactId>
+  <version>0.1.0</version>
+  <packaging>jar</packaging>
+
+  <name>FPF</name>
+  <description>FacturPass Format (FPF) 1.1 reference implementation</description>
+
+  <licenses>
+    <license>
+      <name>AGPL-3.0-or-later</name>
+    </license>
+  </licenses>
+
+  <properties>
+    <!-- The platform default encoding is not UTF-8 everywhere (Cp1252 on a
+         French Windows), and an FPF document carries accented legal names.
+         Pinning it here is what keeps the byte-exact "1." transport honest. -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.release>17</maven.compiler.release>
+    <jackson.version>2.17.2</jackson.version>
+    <junit.version>5.10.2</junit.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Pinned: the version Maven defaults to predates JUnit 5 and reports
+             zero tests run instead of failing. -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.5</version>
+      </plugin>
+    </plugins>
+  </build>
+</project>
