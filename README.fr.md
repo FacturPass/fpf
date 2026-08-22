@@ -40,6 +40,7 @@ directement — lire le format, générer le format — sans dépendre de Factur
   - [`rust/`](rust/README.md) — Rust.
   - [`csharp/`](csharp/README.md) — C#.
   - [`pascal/`](pascal/README.md) — Free Pascal (portable vers Delphi).
+  - [`java/`](java/README.md) — Java 17.
 
 ## Transport
 
